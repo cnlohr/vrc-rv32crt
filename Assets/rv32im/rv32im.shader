@@ -1,4 +1,4 @@
-Shader "rv32ima/compute"
+Shader "rv32ima/rv32im-compute"
 {
 	Properties
 	{
@@ -14,6 +14,7 @@ Shader "rv32ima/compute"
 
 		Pass
 		{
+			Name "Initialization"
 			ZTest Always 
 			Blend One Zero
 
@@ -38,6 +39,7 @@ Shader "rv32ima/compute"
 			{
 				v2f o;
 				o.vertex = UnityObjectToClipPos(IN.vertex);
+				o.batchID = 0;
 				return o;
 			}
 			
@@ -53,6 +55,7 @@ Shader "rv32ima/compute"
 		Pass
 		{
 			ZTest Always 
+			Name "Run"
 			//Blend One Zero
 
 			CGPROGRAM
@@ -64,7 +67,7 @@ Shader "rv32ima/compute"
 			#pragma exclude_renderers d3d9	 // Just tried adding these because of a bgolus post to test,has no impact.
 			#pragma target 5.0
 
-			//#pragma skip_optimizations d3d11
+			#pragma skip_optimizations d3d11
 			#pragma enable_d3d11_debug_symbols
 
 			uint _SingleStepGo;
@@ -72,7 +75,6 @@ Shader "rv32ima/compute"
 			float _ElapsedTime;
 			#include "vrc-rv32im.cginc"			
 			#include "gpucache.h"
-
 
 			struct appdata
 			{

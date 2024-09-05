@@ -1,0 +1,33 @@
+
+test.elf:     file format elf32-littleriscv
+
+
+Disassembly of section .init:
+
+00000000 <InterruptVector>:
+   0:	00c0006f          	j	c <_start>
+   4:	0040006f          	j	8 <_interrupttest>
+
+00000008 <_interrupttest>:
+   8:	0000006f          	j	8 <_interrupttest>
+
+0000000c <_start>:
+   c:	12abd6b7          	lui	a3,0x12abd
+  10:	def68693          	addi	a3,a3,-529 # 12abcdef <_einit+0x12abcdd3>
+  14:	0080006f          	j	1c <_einit>
+
+00000018 <_loop>:
+  18:	0000006f          	j	18 <_loop>
+
+Disassembly of section .text:
+
+0000001c <main>:
+  1c:	ff010113          	addi	sp,sp,-16
+  20:	00812623          	sw	s0,12(sp)
+  24:	01010413          	addi	s0,sp,16
+  28:	200007b7          	lui	a5,0x20000
+  2c:	0007a783          	lw	a5,0(a5) # 20000000 <a>
+  30:	00078513          	mv	a0,a5
+  34:	00c12403          	lw	s0,12(sp)
+  38:	01010113          	addi	sp,sp,16
+  3c:	00008067          	ret
