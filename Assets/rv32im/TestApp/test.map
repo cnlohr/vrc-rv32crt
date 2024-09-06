@@ -4,21 +4,24 @@ test.elf:     file format elf32-littleriscv
 SYMBOL TABLE:
 00000000 l    d  .init	00000000 .init
 0000001c l    d  .text	00000000 .text
-00000040 l    d  .fini	00000000 .fini
+00000064 l    d  .fini	00000000 .fini
 20000000 l    d  .dalign	00000000 .dalign
-00000040 l    d  .dlalign	00000000 .dlalign
+00000064 l    d  .dlalign	00000000 .dlalign
 20000000 l    d  .data	00000000 .data
-20000000 l    d  .bss	00000000 .bss
+20000100 l    d  .bss	00000000 .bss
 00000000 l    d  .riscv.attributes	00000000 .riscv.attributes
-00000000 l    df *ABS*	00000000 C:\Users\cnlohr\AppData\Local\Temp\ccAFwttn.o
+00000000 l    df *ABS*	00000000 C:\Users\cnlohr\AppData\Local\Temp\cced8OyF.o
 0000000c l       .init	00000000 _start
 00000008 l       .init	00000000 _interrupttest
 00000018 l       .init	00000000 _loop
 00000000 l    df *ABS*	00000000 
-20000000 l     O .bss	00000004 a
+20000100 l     O .bss	00000004 a
+20000180 l     O .bss	00000004 b
+20000000 l     O .data	00000004 c
+20000080 l     O .data	00000004 d
 00000000 g       .init	00000000 InterruptVector
 0000001c g       .init	00000000 _einit
-0000001c g     F .text	00000024 main
+0000001c g     F .text	00000048 main
 00000000 g       .init	00000000 _sinit
 
 

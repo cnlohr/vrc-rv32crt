@@ -108,18 +108,18 @@ SECTIONS
       PROVIDE(_data_lma = .);
     } >FLASH AT>FLASH
 
-    .data  : /*ALIGN(128) : SUBALIGN(128) *//* force every element within to be aligned to 128-bits, because the cache lines are destructive */
+    .data : SUBALIGN(128) /* force every element within to be aligned to 128-bits, because the cache lines are destructive */
     {
-      . = ALIGN(4);
+      . = ALIGN(128);
       *(.gnu.linkonce.r.*)
       *(.data .data.*)
       *(.gnu.linkonce.d.*)
-      . = ALIGN(8);
+      . = ALIGN(128);
       PROVIDE( __global_pointer$ = . + 0x800 );
       *(.sdata .sdata.*)
       *(.sdata2*)
       *(.gnu.linkonce.s.*)
-      . = ALIGN(8);
+      . = ALIGN(128);
       *(.srodata.cst16)
       *(.srodata.cst8)
       *(.srodata.cst4)
@@ -131,7 +131,7 @@ SECTIONS
 
     .bss ALIGN(128) : SUBALIGN(128) /* force every element within to be aligned to 128-bits, because the cache lines are destructive */
     {
-      . = ALIGN(4);
+      . = ALIGN(128);
       PROVIDE( _sbss = .);
       *(.sbss*)
       *(.gnu.linkonce.sb.*)
