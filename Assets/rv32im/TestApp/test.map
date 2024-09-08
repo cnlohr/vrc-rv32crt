@@ -2,26 +2,41 @@
 test.elf:     file format elf32-littleriscv
 
 SYMBOL TABLE:
-00000000 l    d  .init	00000000 .init
-0000001c l    d  .text	00000000 .text
-00000064 l    d  .fini	00000000 .fini
-20000000 l    d  .dalign	00000000 .dalign
-00000064 l    d  .dlalign	00000000 .dlalign
-20000000 l    d  .data	00000000 .data
-20000100 l    d  .bss	00000000 .bss
+80000000 l    d  .init	00000000 .init
+80000084 l    d  .text	00000000 .text
+80000dc0 l    d  .fini	00000000 .fini
+a0000000 l    d  .dalign	00000000 .dalign
+80000dc0 l    d  .dlalign	00000000 .dlalign
+a0000000 l    d  .data	00000000 .data
+a0000080 l    d  .bss	00000000 .bss
 00000000 l    d  .riscv.attributes	00000000 .riscv.attributes
-00000000 l    df *ABS*	00000000 C:\Users\cnlohr\AppData\Local\Temp\cced8OyF.o
-0000000c l       .init	00000000 _start
-00000008 l       .init	00000000 _interrupttest
-00000018 l       .init	00000000 _loop
+00000000 l    df *ABS*	00000000 C:\Users\cnlohr\AppData\Local\Temp\ccAu2wUc.o
+8000000c l       .init	00000000 _start
+80000008 l       .init	00000000 _interrupttest
 00000000 l    df *ABS*	00000000 
-20000100 l     O .bss	00000004 a
-20000180 l     O .bss	00000004 b
-20000000 l     O .data	00000004 c
-20000080 l     O .data	00000004 d
-00000000 g       .init	00000000 InterruptVector
-0000001c g       .init	00000000 _einit
-0000001c g     F .text	00000048 main
-00000000 g       .init	00000000 _sinit
+a0000200 l     O .bss	00001f40 termdata
+a0000080 l     O .bss	00000004 cursorx
+a0000100 l     O .bss	00000004 cursory
+80000084 l     F .text	00000044 __puts_uart
+80000ad0 l     F .text	000001fc _write
+8000063c l     F .text	00000494 mini_vpprintf
+80000260 l     F .text	000001c0 mini_itoa
+80000420 l     F .text	00000148 mini_pad
+80000568 l     F .text	000000d4 _puts
+800000c8  w    F .text	0000007c printf
+a0000880 g       .data	00000000 __global_pointer$
+80000000 g       .init	00000000 InterruptVector
+800001fc  w    F .text	00000064 puts
+80000084 g       .init	00000000 _einit
+a0000180 g       .bss	00000000 hartid
+a0000000 g       .dalign	00000000 _data_vma
+80000194  w    F .text	00000068 memset
+80000ccc g     F .text	00000050 main
+a0000000 g     O .data	00000010 hardwaredef
+80000000 g       .init	00000000 _sinit
+a0100000 g       .bss	00000000 _eusrstack
+a0000080 g       .data	00000000 _edata
+80000dc0 g       .dlalign	00000000 _data_lma
+80000144  w    F .text	00000050 strlen
 
 

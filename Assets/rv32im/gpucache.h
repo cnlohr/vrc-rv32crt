@@ -26,39 +26,48 @@
 
 			// Only use if aligned-to-4-bytes.
 			uint LoadMemInternalRB( uint ptr )
-			{
+			{				
 				uint remainder4 = ((ptr&0xc)>>2);
-				uint blockno = ptr >> 4;
-				uint blocknop1 = blockno+1;
-				uint hash = (blockno % (CACHE_BLOCKS/CACHE_N_WAY)) * CACHE_N_WAY;
-				uint4 block;
-				uint ct = 0;
-				uint i;
 				uint4 ret = 0;
-				for( i = 0; i < CACHE_N_WAY; i++ )
+				
+				if( ptr < MEMORY_SPLIT )
 				{
-					ct = cachesetsaddy[i+hash];
-					if( ct == blocknop1 )
+					uint blockno = ptr >> 4;
+					ret = FlashSystemAccess( blockno );	
+				}
+				else
+				{
+					ptr -= MEMORY_SPLIT;
+					uint blockno = ptr >> 4;
+					uint blocknop1 = blockno+1;
+					uint hash = (blockno % (CACHE_BLOCKS/CACHE_N_WAY)) * CACHE_N_WAY;
+					uint4 block;
+					uint ct = 0;
+					uint i;
+					for( i = 0; i < CACHE_N_WAY; i++ )
 					{
-						// Found block.
-						ret = cachesetsdata[(i+hash)];
-						break;
-					}
-					else if( ct == 0 )
-					{
-						// else, no block found. Read data.
-						ret = MainSystemAccess( blockno );
-						break;
+						ct = cachesetsaddy[i+hash];
+						if( ct == blocknop1 )
+						{
+							// Found block.
+							ret = cachesetsdata[(i+hash)];
+							break;
+						}
+						else if( ct == 0 )
+						{
+							// else, no block found. Read data.
+							ret = MainSystemAccess( blockno );
+							break;
+						}
 					}
 				}
 				return U4Select( ret, remainder4 );
 			}
 
-
-
 			// Store mem internal word (Only use if guaranteed word-alignment)
 			void StoreMemInternalRB( uint ptr, uint val )
 			{
+				ptr -= MEMORY_SPLIT;
 				uint ptrleftover = (ptr & 0xc)>>2;
 				//printf( "STORE %08x %08x\n", ptr, val );
 				uint blockno = ptr >> 4;  

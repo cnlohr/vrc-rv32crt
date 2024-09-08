@@ -1,0 +1,54 @@
+
+// From The middle of the code (no A)
+#if 0
+					case 0x2f: // RV32A (0b00101111)
+					{
+						uint32_t rs1 = REG((ir >> 15) & 0x1f);
+						uint32_t rs2 = REG((ir >> 20) & 0x1f);
+						uint32_t irmid = ( ir>>27 ) & 0x1f;
+
+						rs1 -= MINIRV32_RAM_IMAGE_OFFSET;
+
+						// We don't implement load/store from UART or CLNT with RV32A here.
+
+						if( rs1 >= MINI_RV32_RAM_SIZE-3 )
+						{
+							trap = (7+1); //Store/AMO access fault
+							rval = rs1 + MINIRV32_RAM_IMAGE_OFFSET;
+						}
+						else
+						{
+							rval = LoadMemInternalRB( rs1 );
+							//MINIRV32_LOAD4( rs1 );
+
+							// Referenced a little bit of https://github.com/franzflasch/riscv_em/blob/master/src/core/core.c
+							uint32_t dowrite = 1;
+							switch( irmid )
+							{
+								case 2: //LR.W (0b00010)
+									dowrite = 0;
+									CSR( extraflags ) = (CSR( extraflags ) & 0x07) | (rs1<<3);
+									break;
+								case 3:  //SC.W (0b00011) (Make sure we have a slot, and, it's valid)
+									rval = ( CSR( extraflags ) >> 3 != ( rs1 & 0x1fffffff ) );  // Validate that our reservation slot is OK.
+									dowrite = !rval; // Only write if slot is valid.
+									break;
+								case 1: break; //AMOSWAP.W (0b00001)
+								case 0: rs2 += rval; break; //AMOADD.W (0b00000)
+								case 4: rs2 ^= rval; break; //AMOXOR.W (0b00100)
+								case 12: rs2 &= rval; break; //AMOAND.W (0b01100)
+								case 8: rs2 |= rval; break; //AMOOR.W (0b01000)
+								case 16: rs2 = ((int32_t)rs2<(int32_t)rval)?rs2:rval; break; //AMOMIN.W (0b10000)
+								case 20: rs2 = ((int32_t)rs2>(int32_t)rval)?rs2:rval; break; //AMOMAX.W (0b10100)
+								case 24: rs2 = (rs2<rval)?rs2:rval; break; //AMOMINU.W (0b11000)
+								case 28: rs2 = (rs2>rval)?rs2:rval; break; //AMOMAXU.W (0b11100)
+								default: trap = (2+1); dowrite = 0; break; //Not supported.
+							}
+							if( dowrite ) 
+							{ StoreMemInternalRB( rs1, rs2 ); if( cache_usage >= MAX_FCNT ) icount = MAXICOUNT; }
+									//MINIRV32_STORE4( rs1, rs2 );
+						}
+						break;
+					}
+#endif
+

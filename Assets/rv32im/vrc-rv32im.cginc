@@ -1,36 +1,48 @@
 #ifndef VRC_RV32IMA
 #define VRC_RV32IMA
 
-#define MAXICOUNT    1024
-#define MAX_FCNT     48
+#define MAXICOUNT    1023
+#define MAX_FCNT     120
 #define CACHE_BLOCKS 128
 #define CACHE_N_WAY  4
 
-Texture2D<uint4> _MainSystemMemory;
+Texture2D<uint4> _FlashMemory;
+float4 _FlashMemory_TexelSize;
 
-#define COMPUTE_OUT_X 64
-#define COMPUTE_OUT_Y 2
+#define CRTTEXTURETYPE uint4
+
+#include "/Assets/flexcrt/flexcrt.cginc"
+
+//#define COMPUTE_OUT_X 256
+//#define COMPUTE_OUT_Y 256
 
 //XXX NOTE: Optimization: May want to hard-code this.
 
-#define SYSTEX_SIZE_X (uint)(_SystemMemorySize.x)
-#define SYSTEX_SIZE_Y (uint)(_SystemMemorySize.y)
-//#define SYSTEX_SIZE_X 1024
-//#define SYSTEX_SIZE_Y 1024
+#define SYSTEX_SIZE_X (uint)(_SelfTexture2D_TexelSize.z)
+#define SYSTEX_SIZE_Y (uint)(_SelfTexture2D_TexelSize.w)
 
-#define MINI_RV32_RAM_SIZE (SYSTEX_SIZE_X*SYSTEX_SIZE_Y*16 - SYSTEX_SIZE_X*16)
+/* Memory Map 
+	0x10000000 to 0x12000000 - Special I/O
+	0x80000000 to 0x9fffffff - Flash  (Up to 512MB, but limited to real data.)
+	0xa0000000 to 0xbfffffff - RAM    (Up to 512MB, but practically, limited.)
+		To be clear - the actual size of RAM in the .lds (linker script) and the CRT MUST match so we know where to put the stack.
+*/
 
-#define MEMORY_BASE 0x80000000
+
+// Farsical memory size, mostly so we can deal with whatever in the cache system. (Was (SYSTEX_SIZE_X*SYSTEX_SIZE_Y*16 - SYSTEX_SIZE_X*16) )
+#define MINI_RV32_RAM_SIZE 0x40000000 //Ram + Flash
 #define MEMORY_SIZE (MINI_RV32_RAM_SIZE)
 #define MINIRV32_RAM_IMAGE_OFFSET  0x80000000
+#define MEMORY_SPLIT 0x20000000
+
+// Cores only take 13 uint4's, but, we should pretend they take 16 (256 bytes total)
+#define CORES 16
 
 
 float4 _GeneralArray[1023];
 float4 _PlayerArray[1023];
 float4 _BoneArray[1023];
 
-
-float4 _SystemMemorySize;
 
 // For intermediate outputs.
 static uint pixelOutputID;
@@ -47,10 +59,11 @@ float4 ClipSpaceCoordinateOut( uint2 coordOut, float2 FlexCRTSize )
 #define MINIRV32_POSTEXEC( pc, ir, trap )
 
 #define MINIRV32_OTHERCSR_WRITE( csrno, writeval ) 
-//if( csrno == 0x139 ) { state[charout] = writeval; icount = MAXICOUNT; }
+	//if( csrno == 0x139 ) { state[charout] = writeval; icount = MAXICOUNT; }
 #define MINIRV32_OTHERCSR_READ( csrno, rval ) rval = 0;
 #define MINIRV32_STATE_DEFINTION inout uint state[52], 
 
+// Not used on avatars.
 uint GetHostInfo( uint rsval )
 {
 	uint pos = ((rsval)>>4) & 0x3ff;
@@ -67,7 +80,7 @@ uint GetHostInfo( uint rsval )
 	return uint( int(v[select]))>>shift;
 }
  
-#define MINIRV32_HANDLE_MEM_STORE_CONTROL( addy, rs2 ) if( addy == 0x10000000 ) { state[charout] = rs2; icount = MAXICOUNT; } else if( addy == 0x11000000 ) { if( rs2 == 1 ) icount = MAXICOUNT; } 
+#define MINIRV32_HANDLE_MEM_STORE_CONTROL( addy, rs2 ) if( addy == 0x10000010 ) { state[advanceddescriptor] = rs2; icount = MAXICOUNT; } else if( addy == 0x11000000 ) { if( rs2 == 1 ) icount = MAXICOUNT; } 
 #define MINIRV32_HANDLE_MEM_LOAD_CONTROL( rsval, rval ) rval = (rsval == 0x10000005) ? 0x60 : ( rsval >= 0x11200000 && rsval < 0x11210000 ) ? GetHostInfo( rsval - 0x11200000 ) : 0x00
 
 //( rsval == 0x1100bff8 ) ? 12 : ( rsval == 0x1100bffc ) ? 34 : 0x00;
@@ -93,7 +106,8 @@ uint GetHostInfo( uint rsval )
 #define extraflags 47
 
 #define UNUSED 48 /* Unused */
-#define charout 49
+//#define charout 49
+#define advanceddescriptor 49
 #define cpucounter 50
 #define scratch00 51
 
@@ -109,7 +123,8 @@ uint GetHostInfo( uint rsval )
 #define AS_SIGNED(val) (asint(val))
 #define AS_UNSIGNED(val) (asuint(val))
 
-#define MainSystemAccess( blockno ) _MainSystemMemory[uint2( (blockno) % SYSTEX_SIZE_X, (blockno) / SYSTEX_SIZE_X)]
+#define MainSystemAccess( blockno ) _SelfTexture2D[uint2( (blockno) % SYSTEX_SIZE_X, (blockno) / SYSTEX_SIZE_X)]
+#define FlashSystemAccess( blockno ) _FlashMemory[uint2( (blockno) % uint(_FlashMemory_TexelSize.z), (blockno) / uint(_FlashMemory_TexelSize.z))]
 #define MINIRV32_STEPPROTO MINIRV32_DECORATE int32_t MiniRV32IMAStep( MINIRV32_STATE_DEFINTION uint32_t elapsedUs )
 
 static uint count;

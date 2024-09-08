@@ -2,11 +2,10 @@ Shader "rv32ima/rv32im-compute"
 {
 	Properties
 	{
-		_MainSystemMemory( "Main System Memory", 2D ) = "black" { }
+		_FlashMemory( "Flash Memory", 2D ) = "black" { }
 		[ToggleUI] _SingleStep( "Single Step Enable", float ) = 0.0
 		[ToggleUI] _SingleStepGo( "Single Step Go", float ) = 0.0
 		_ElapsedTime( "Elapsed Time", float ) = .0001
-		_SystemMemorySize( "System Memory Size", Vector ) = ( 0, 0, 0, 0)
 	}
 	SubShader
 	{
@@ -23,6 +22,9 @@ Shader "rv32ima/rv32im-compute"
 			#pragma vertex vert
 			#pragma fragment frag
 			#pragma target 5.0
+
+			#include "vrc-rv32im.cginc"			
+			#include "gpucache.h"
 
 			struct appdata
 			{
@@ -44,9 +46,19 @@ Shader "rv32ima/rv32im-compute"
 			}
 			
 			
-			float4 frag (v2f i) : SV_Target
+			uint4 frag (v2f i) : SV_Target
             {
-				return 0;
+				int ty = SYSTEX_SIZE_Y - i.vertex.y - 1;
+				if( ty >= CORES )
+					return 0.0;
+				else if( uint(i.vertex.x) == 2 )
+					return uint4( ty /*hart ID*/, 0 /*Normally, DTB, but not set here.*/, 0, 0);
+				else if( uint(i.vertex.x) == 8 )
+					return uint4( 0x80000000 /* pc */, 0,0,0);
+				else if( uint(i.vertex.x) == 11 )
+					return uint4( 0, 0, 0, 3 /*Machine Mode*/);
+				else
+					return 0.0;
 			}
 			
 			ENDCG
@@ -73,6 +85,7 @@ Shader "rv32ima/rv32im-compute"
 			uint _SingleStepGo;
 			uint _SingleStep;
 			float _ElapsedTime;
+
 			#include "vrc-rv32im.cginc"			
 			#include "gpucache.h"
 
@@ -109,11 +122,22 @@ Shader "rv32ima/rv32im-compute"
 			#if UNITY_SINGLE_PASS_STEREO
 				return;
 			#else
-			
-				int batchID = input[0].batchID; // Should always be 0?
+				int batchID = input[0].batchID;
+				// batchID*3 generally geoPrimID.
 
 				g2f o;
 				uint i;
+
+//				uint2 coordOut = uint2( geoPrimID, 255 );
+//				o.vertex = ClipSpaceCoordinateOut( coordOut, float2( SYSTEX_SIZE_X, SYSTEX_SIZE_Y ) );
+//				o.color = uint4( LoadMemInternal(0x00000003, 4).x, 1, 0x34444444, 0x3eFFFFFF );
+//
+//				stream.Append(o);
+//			
+//				return;
+			
+				uint thisCore = 0;
+
 				uint pixelOutputID = 0;
 				uint elapsedUs = _ElapsedTime * 1000000;
 
@@ -124,7 +148,7 @@ Shader "rv32ima/rv32im-compute"
 				{
 					for( i = 0; i < 13; i++ )
 					{
-						uint4 v = _MainSystemMemory.Load( uint3( i, SYSTEX_SIZE_Y-1, 0 ) );
+						uint4 v = _SelfTexture2D.Load( uint3( i, SYSTEX_SIZE_Y-1, 0 ) );
 						state[i*4+0] = v.x;
 						state[i*4+1] = v.y;
 						state[i*4+2] = v.z;
@@ -132,7 +156,7 @@ Shader "rv32ima/rv32im-compute"
 					}
 				}
 				
-				state[charout] = 0;
+				//state[charout] = 0;
 
 				bool nogo = false;
 				
@@ -519,55 +543,7 @@ Shader "rv32ima/rv32im-compute"
 							trap = (2+1); 				// Note micrrop 0b100 == undefined.
 						break;
 					}
-					case 0x2f: // RV32A (0b00101111)
-					{
-						uint32_t rs1 = REG((ir >> 15) & 0x1f);
-						uint32_t rs2 = REG((ir >> 20) & 0x1f);
-						uint32_t irmid = ( ir>>27 ) & 0x1f;
-
-						rs1 -= MINIRV32_RAM_IMAGE_OFFSET;
-
-						// We don't implement load/store from UART or CLNT with RV32A here.
-
-						if( rs1 >= MINI_RV32_RAM_SIZE-3 )
-						{
-							trap = (7+1); //Store/AMO access fault
-							rval = rs1 + MINIRV32_RAM_IMAGE_OFFSET;
-						}
-						else
-						{
-							rval = LoadMemInternalRB( rs1 );
-							//MINIRV32_LOAD4( rs1 );
-
-							// Referenced a little bit of https://github.com/franzflasch/riscv_em/blob/master/src/core/core.c
-							uint32_t dowrite = 1;
-							switch( irmid )
-							{
-								case 2: //LR.W (0b00010)
-									dowrite = 0;
-									CSR( extraflags ) = (CSR( extraflags ) & 0x07) | (rs1<<3);
-									break;
-								case 3:  //SC.W (0b00011) (Make sure we have a slot, and, it's valid)
-									rval = ( CSR( extraflags ) >> 3 != ( rs1 & 0x1fffffff ) );  // Validate that our reservation slot is OK.
-									dowrite = !rval; // Only write if slot is valid.
-									break;
-								case 1: break; //AMOSWAP.W (0b00001)
-								case 0: rs2 += rval; break; //AMOADD.W (0b00000)
-								case 4: rs2 ^= rval; break; //AMOXOR.W (0b00100)
-								case 12: rs2 &= rval; break; //AMOAND.W (0b01100)
-								case 8: rs2 |= rval; break; //AMOOR.W (0b01000)
-								case 16: rs2 = ((int32_t)rs2<(int32_t)rval)?rs2:rval; break; //AMOMIN.W (0b10000)
-								case 20: rs2 = ((int32_t)rs2>(int32_t)rval)?rs2:rval; break; //AMOMAX.W (0b10100)
-								case 24: rs2 = (rs2<rval)?rs2:rval; break; //AMOMINU.W (0b11000)
-								case 28: rs2 = (rs2>rval)?rs2:rval; break; //AMOMAXU.W (0b11100)
-								default: trap = (2+1); dowrite = 0; break; //Not supported.
-							}
-							if( dowrite ) 
-							{ StoreMemInternalRB( rs1, rs2 ); if( cache_usage >= MAX_FCNT ) icount = MAXICOUNT; }
-									//MINIRV32_STORE4( rs1, rs2 );
-						}
-						break;
-					}
+					
 					default: trap = (2+1); break; // Fault: Invalid opcode.
 				}
 
@@ -623,18 +599,21 @@ Shader "rv32ima/rv32im-compute"
 					
 				}
 
+
+//StoreMemInternalRB( 0x20000000, 0xaaaa0000 );
+//uint2 coordOut = uint2( 0 % SYSTEX_SIZE_X, 0 / SYSTEX_SIZE_X );
+//o.vertex = ClipSpaceCoordinateOut( coordOut, float2(SYSTEX_SIZE_X,SYSTEX_SIZE_Y) );
+//o.color = 0xbbbb0000;
+//stream.Append(o);
 				
 				for( i = 0; i < CACHE_BLOCKS; i++ )
 				{
 					uint a = cachesetsaddy[i];
 					if( a > 0 )
 					{
-						uint2 coordOut = uint2( pixelOutputID, 0 + gid * 2  );
-						o.vertex = ClipSpaceCoordinateOut( coordOut, float2(COMPUTE_OUT_X,COMPUTE_OUT_Y) );
-						o.color = uint4(a, 0, 0, 0);
-						stream.Append(o);
-						coordOut = uint2( pixelOutputID++, 1 + gid * 2  );
-						o.vertex = ClipSpaceCoordinateOut( coordOut, float2(COMPUTE_OUT_X,COMPUTE_OUT_Y) );
+						a--;
+						uint2 coordOut = uint2( a % SYSTEX_SIZE_X, a / SYSTEX_SIZE_X );
+						o.vertex = ClipSpaceCoordinateOut( coordOut, float2(SYSTEX_SIZE_X,SYSTEX_SIZE_Y) );
 						o.color = cachesetsdata[i];
 						stream.Append(o);
 					}
@@ -647,13 +626,8 @@ Shader "rv32ima/rv32im-compute"
 					for( i = 0; i < 13; i++ )
 					{
 						statealias[i] = uint4( state[i*4+0], state[i*4+1], state[i*4+2], state[i*4+3] );
-
-						uint2 coordOut = uint2( 64-13+i, 0  + gid * 2  );
-						o.vertex = ClipSpaceCoordinateOut( coordOut, float2(COMPUTE_OUT_X,COMPUTE_OUT_Y) );
-						o.color = uint4((MINI_RV32_RAM_SIZE)/16+1+i, instanceID, geoPrimID, 0);
-						stream.Append(o);
-						coordOut = uint2( 64-13+i, 1 + gid * 2 );
-						o.vertex = ClipSpaceCoordinateOut(coordOut, float2(COMPUTE_OUT_X,COMPUTE_OUT_Y) );
+						uint2 coordOut = uint2( i, SYSTEX_SIZE_Y - thisCore - 1 );
+						o.vertex = ClipSpaceCoordinateOut(coordOut, float2(SYSTEX_SIZE_X,SYSTEX_SIZE_Y) );
 						o.color = statealias[i];
 						stream.Append(o);
 					}
