@@ -115,6 +115,7 @@ Material:
     - _SuperColumns: 8
     - _SuperLines: 8
     - _UVSec: 0
+    - _WhichTerminal: 0
     - _ZWrite: 1
     m_Colors:
     - _Color: {r: 1, g: 1, b: 1, a: 1}

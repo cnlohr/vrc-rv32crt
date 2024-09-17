@@ -48,11 +48,17 @@ Shader "rv32ima/rv32im-compute"
 			
 			uint4 frag (v2f i) : SV_Target
             {
-				int ty = SYSTEX_SIZE_Y - i.vertex.y - 1;
-				if( ty >= CORES )
+				int hartid = _CustomRenderTextureHeight - i.vertex.y;
+				
+				if( hartid >= CORES )
 					return 0.0;
+				else if( uint(i.vertex.x) == 0 )
+				{
+					uint thissp = i.vertex.y * _CustomRenderTextureWidth * 4 * 4 + 208 + 0xa0000000;
+					return uint4( 0, 0, thissp /* Stack pointer, set, by default, to end of this processor state. */, 0 );
+				}
 				else if( uint(i.vertex.x) == 2 )
-					return uint4( ty /*hart ID*/, 0 /*Normally, DTB, but not set here.*/, 0, 0);
+					return uint4( 0, 0, hartid, 0 /*Normally, DTB, but not set here.*/ );
 				else if( uint(i.vertex.x) == 8 )
 					return uint4( 0x80000000 /* pc */, 0,0,0);
 				else if( uint(i.vertex.x) == 11 )
@@ -115,7 +121,7 @@ Shader "rv32ima/rv32im-compute"
 			}
 			
 			[maxvertexcount(128)]
-			[instance(1)]
+			[instance(CORES)]
 			void geo( point v2g input[1], inout PointStream<g2f> stream,
 				uint instanceID : SV_GSInstanceID, uint geoPrimID : SV_PrimitiveID )
 			{
@@ -136,7 +142,9 @@ Shader "rv32ima/rv32im-compute"
 //			
 //				return;
 			
-				uint thisCore = 0;
+				uint thisCore = instanceID;
+
+				if( geoPrimID != 0 ) return;
 
 				uint pixelOutputID = 0;
 				uint elapsedUs = _ElapsedTime * 1000000;
@@ -148,7 +156,7 @@ Shader "rv32ima/rv32im-compute"
 				{
 					for( i = 0; i < 13; i++ )
 					{
-						uint4 v = _SelfTexture2D.Load( uint3( i, SYSTEX_SIZE_Y-1, 0 ) );
+						uint4 v = _SelfTexture2D.Load( uint3( i, SYSTEX_SIZE_Y-thisCore-1, 0 ) );
 						state[i*4+0] = v.x;
 						state[i*4+1] = v.y;
 						state[i*4+2] = v.z;
@@ -169,8 +177,9 @@ Shader "rv32ima/rv32im-compute"
 					count = MAXICOUNT;
 				}
 
-				int gid = geoPrimID*4 + instanceID*32;
-				if( gid != 0 ) return;
+				// Uncomment to only allow core 0.
+				//int gid = geoPrimID*4 + instanceID*32;
+				//if( gid != 0 ) return;
 
 
 				if( !nogo )
@@ -535,6 +544,7 @@ Shader "rv32ima/rv32im-compute"
 								{
 								case 0: trap = ( CSR( extraflags ) & 3) ? (11+1) : (8+1); break; // ECALL; 8 = "Environment call from U-mode"; 11 = "Environment call from M-mode"
 								case 1:	trap = (3+1); break; // EBREAK 3 = "Breakpoint"
+								case 33: icount = MAXICOUNT; SETCSR( pcreg, pc + 4 ); break; // "Pause execution" "pcont"  //XXX NON-STANDARD XXX
 								default: trap = (2+1); break; // Illegal opcode.
 								}
 							}

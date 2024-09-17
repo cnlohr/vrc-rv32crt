@@ -1,17 +1,17 @@
-﻿Shader "rv32im/TerminalFromDescriptor"
+Shader "rv32im/backscreen"
 {
-	Properties
-	{
+    Properties
+    {
 		_SystemRam ("System RAM", 2D) = "white" {}
 		[Toggle(_ShowHex)] _ShowHex ("Show Hex", float) = 0.0
 		_WhichTerminal ("Which Terminal", int) = 0
-	}
-	SubShader
-	{
-		Tags { "RenderType"="Opaque" }
-
-		Pass
-		{			
+    }
+    SubShader
+    {
+        Tags { "RenderType"="Opaque" }
+        Pass
+        {
+			Cull Back
 			CGPROGRAM
 			#pragma vertex vert
 			#pragma fragment frag
@@ -25,11 +25,12 @@
 			#include "../vrc-rv32im.cginc"
 			#include "../gpucache.h"
 			#include "/Assets/MSDFShaderPrintf/MSDFShaderPrintf.cginc"
-			
+
 			uint _WhichTerminal;
-			
+
 			float PrintHex( uint val, float2 uv, float grad )
 			{
+				//uv.x = 1.0 - uv.x;
 				uv *= float2( 2, 1 );
 				int charno = uv.x;
 				int row = uv.y/7;
@@ -104,12 +105,15 @@
 
 				uv *= termsize;
 				uint2 coord = uint2( uv.x, termsize.y-uv.y );
-
-				float4 grad = float4( ddx(uv), ddy(uv) );
-
 				uv.x = frac( uv );
 				float4 color = 0;
 
+//				uv.x = 1.0 - uv.x;
+				float4 grad = float4( ddx(uv), ddy(uv) );
+				float4 gradC = float4( ddx(coord), ddy(coord) );
+				
+				// Blank corners.
+				if( length(gradC)>0.0 ) return 0.0;
 			
 				uint u = LoadMemInternalRBNoCache( i.term + ( ( ( coord.x + i.termscroll.x ) % i.termsize.x ) * 4 ) + ( ( coord.y + i.termscroll.y ) % i.termsize.y ) * 4 * termsize.x );
 				
@@ -126,6 +130,69 @@
 				return color;
 			}
 			ENDCG
-		}
-	}
+        }
+
+        Pass
+        {
+			Cull Front
+			ZTest Off
+            CGPROGRAM
+            #pragma vertex vert
+            #pragma fragment frag
+            // make fog work
+            #pragma multi_compile_fog
+
+            #include "UnityCG.cginc"
+
+            struct appdata
+            {
+                float4 vertex : POSITION;
+                float2 uv : TEXCOORD0;
+            };
+
+            struct v2f
+            {
+                float2 uv : TEXCOORD0;
+                UNITY_FOG_COORDS(1)
+                float4 vertex : SV_POSITION;
+            };
+
+            Texture2D<float4> _SystemTex;
+
+            v2f vert (appdata v)
+            {
+                v2f o;
+				
+				if( _ScreenParams.x != 256 || _ScreenParams.y != 256 )
+				{
+					o.vertex = 0.0;
+					o.uv = 0.0;
+				}
+				else
+				{
+					o.vertex = float4( v.vertex.xy, 0.0, 0.5 );
+					o.uv = v.uv * 256;
+				}
+                return o;
+            }
+
+            uint4 frag (v2f i) : SV_Target
+            {
+				if( i.uv.y > 1 ) discard;
+				
+				int4 col = 0x80000001;
+				switch( i.uv.x )
+				{
+				case 0: col = unity_ObjectToWorld[0] * 4096; break;
+				case 1: col = unity_ObjectToWorld[1] * 4096; break;
+				case 2: col = unity_ObjectToWorld[2] * 4096; break;
+				case 3: col = unity_ObjectToWorld[3] * 4096; break;
+				case 4: col = uint4( _Time.y * 1000, 0, 0, 0 ); break;
+				}
+				
+                return ( col );
+            }
+            ENDCG
+        }
+    }
 }

@@ -1,11 +1,10 @@
 // Exports
 
+#include "vrcrv.h"
+
 .global InterruptVector
 
 .section .bss
-.global hartid
-hartid:
-	.word 0x00000000
 
 .section .init
 InterruptVector:
@@ -24,9 +23,12 @@ _start:
 	la gp, __global_pointer$
 .option pop
 
-	la sp, _eusrstack
+
 	li a3, 0x80
 	csrw mstatus, a3
+
+	bnez a0, not_processor_zero
+	la sp, _eusrstack
 	
 	// Test writing to RAM.
 	//la a3, 0xa0000000
@@ -56,9 +58,6 @@ _start:
 	bne a4, a5, 1b
 2:
 
-	la a3, hartid
-	sw a0, 0(a3)
-
 	la a3, 0x10000010
 	la a4, hardwaredef
 	sw a4, 0(a3)
@@ -67,3 +66,34 @@ _start:
 	ori a7, a4, 0
 	csrw mepc, a4
 	mret
+
+not_processor_zero:
+	// Other processors dont have a stack or anything...
+
+	la a3, hardwaredef
+1:
+	lw a7, 48(a3)
+	beqz a7, 1b
+
+	la a4, otherharts
+	ori a7, a4, 0
+	csrw mepc, a4
+	mret
+
+	
+/*	
+	// A7 contains the pointer to the back buffer now.
+	slli a1, a0, 6
+	add a7, a7, a1
+	
+	li a6, '0'
+	add a6, a0, a6
+	sw a6, 0(a7)
+	sw a6, 4(a7)
+	sw a6, 8(a7)
+	sw a6, 12(a7)
+
+1:
+	//PCONT
+	j 1b
+*/

@@ -3,6 +3,7 @@
 	Properties
 	{
 		_SystemMemory ("SystemMemory", 2D) = "white" {}
+		_CoreNo ("Core No", int) = 0
 	}
 	SubShader
 	{
@@ -26,6 +27,7 @@
 			Texture2D<uint4> _SystemMemory;
 			float4 _SystemMemory_TexelSize;
 			float4 _SystemMemory_ST;
+			uint _CoreNo;
 
 			float4 PrintHex( uint4 val, float2 uv, float4 grad )
 			{
@@ -211,7 +213,7 @@
 					else
 					{
 						uint mcell = group/4;
-						uint4 cell = _SystemMemory.Load( uint3( mcell, _SystemMemory_TexelSize.w-1, 0 ) );
+						uint4 cell = _SystemMemory.Load( uint3( mcell, _SystemMemory_TexelSize.w-1-_CoreNo, 0 ) );
 						if( uv.x > 1 )
 						{
 							uv.x *= 8.0;

@@ -35,8 +35,9 @@ float4 _FlashMemory_TexelSize;
 #define MINIRV32_RAM_IMAGE_OFFSET  0x80000000
 #define MEMORY_SPLIT 0x20000000
 
-// Cores only take 13 uint4's, but, we should pretend they take 16 (256 bytes total)
-#define CORES 16
+// Cores only take 13 uint4's, but, we should pretend they take a whole line to provide a short-cut stack, or processor-local data.
+// Processor state takes up 208 bytes.
+#define CORES 32
 
 
 float4 _GeneralArray[1023];
