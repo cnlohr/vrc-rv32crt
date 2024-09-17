@@ -4,7 +4,6 @@ int cursory;
 
 int _write( int desc, const uint8_t * str, int len );
 
-
 #include "microlibc.h"
 
 int _write( int desc, const uint8_t * str, int len )

@@ -6,6 +6,7 @@ Shader "rv32ima/rv32im-compute"
 		[ToggleUI] _SingleStep( "Single Step Enable", float ) = 0.0
 		[ToggleUI] _SingleStepGo( "Single Step Go", float ) = 0.0
 		_ElapsedTime( "Elapsed Time", float ) = .0001
+		_BackScreenFromCamera( "Back Screen From Camera", 2D ) = "black" { }
 	}
 	SubShader
 	{
@@ -91,6 +92,7 @@ Shader "rv32ima/rv32im-compute"
 			uint _SingleStepGo;
 			uint _SingleStep;
 			float _ElapsedTime;
+			Texture2D<uint4> _BackScreenFromCamera;
 
 			#include "vrc-rv32im.cginc"			
 			#include "gpucache.h"
@@ -308,6 +310,12 @@ Shader "rv32ima/rv32im-compute"
 									rval = CSR( timerl );
 								else
 									MINIRV32_HANDLE_MEM_LOAD_CONTROL( rsval, rval );
+							}
+							else if( rsval >= 0xf0000000 && rsval < 0xff000000 )
+							{
+								rsval-=0xf0000000;
+								uint px = rsval / 16;
+								rval = _BackScreenFromCamera[uint2(px%256, 255-px/256)][(rsval/4)%4];
 							}
 							else
 							{

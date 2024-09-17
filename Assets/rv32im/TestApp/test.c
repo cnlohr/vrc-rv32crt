@@ -36,7 +36,14 @@ void main( void )
 
 	for( i = 0; ; i++ )
 	{
-		printf( "%d ", i );
+		cursorx = 0;
+		cursory = 2;
+		printf( "%d\n", i );
+		printf( "%d %d %d %d    \n", EXTCAM[0], EXTCAM[4], EXTCAM[8], EXTCAM[12] );
+		printf( "%d %d %d %d    \n", EXTCAM[1], EXTCAM[5], EXTCAM[9], EXTCAM[13] );
+		printf( "%d %d %d %d    \n", EXTCAM[2], EXTCAM[6], EXTCAM[10], EXTCAM[14] );
+		printf( "%d %d %d %d    \n", EXTCAM[3], EXTCAM[7], EXTCAM[11], EXTCAM[15] );
+		printf( "%d %d\n", EXTCAM[16]/1024, EXTCAM[17] );
 		pcont();
 	}	
 //	while(1);

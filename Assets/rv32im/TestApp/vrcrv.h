@@ -21,9 +21,12 @@ struct Hardware
 	uint32_t backscreenSY;
 	uint32_t * backscreendata;
 	uint32_t res1[3];
-	
 };
+
 static inline void pcont(void) { asm volatile( ".word 0x02100073" : : : "memory" ); }
+
+#define EXTCAM ((uint32_t*)0xf0000000)
+
 #endif
 
 #endif
