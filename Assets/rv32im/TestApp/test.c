@@ -39,10 +39,13 @@ void main( void )
 		cursorx = 0;
 		cursory = 2;
 		printf( "%d\n", i );
-		printf( "%d %d %d %d %d   \n", HID->PointerX, HID->PointerX2, HID->Screen[3][0], HID->GunBack[3][0], HID->GunTip[3][0] );
-		printf( "%d %d %d %d %d   \n", HID->PointerY, HID->PointerY2, HID->Screen[3][1], HID->GunBack[3][1], HID->GunTip[3][1] );
-		printf( "%d %d %d %d %d   \n", HID->PointerZ, HID->PointerZ2, HID->Screen[3][2], HID->GunBack[3][2], HID->GunTip[3][2] );
-		printf( "%d %d %d %d %d   \n", 0, 0, HID->Screen[3][3], HID->GunBack[3][3], HID->GunTip[3][3] );
+		//printf( "%d %d %d %d %d   \n", HID->PointerX, HID->PointerX2, HID->Screen[3][0], HID->GunBack[3][0], HID->GunTip[3][0] );
+		//printf( "%d %d %d %d %d   \n", HID->PointerY, HID->PointerY2, HID->Screen[3][1], HID->GunBack[3][1], HID->GunTip[3][1] );
+		//printf( "%d %d %d %d %d   \n", HID->PointerZ, HID->PointerZ2, HID->Screen[3][2], HID->GunBack[3][2], HID->GunTip[3][2] );
+		//printf( "%d %d %d %d %d   \n", 0, 0, HID->Screen[3][3], HID->GunBack[3][3], HID->GunTip[3][3] );
+		printf( "%d %d    \n", HID->PointerX, HID->PointerX2 );
+		printf( "%d %d    \n", HID->PointerY, HID->PointerY2 );
+		printf( "%d %d    \n", HID->PointerZ, HID->PointerZ2 );
 		printf( "%d   %d       \n", HID->TimeMS, HID->TriggerRight );
 		//printf( "%d %d\n", EXTCAM[16]/1024, EXTCAM[17] );
 		
