@@ -39,11 +39,19 @@ void main( void )
 		cursorx = 0;
 		cursory = 2;
 		printf( "%d\n", i );
-		printf( "%d %d %d %d    \n", EXTCAM[0], EXTCAM[4], EXTCAM[8], EXTCAM[12] );
-		printf( "%d %d %d %d    \n", EXTCAM[1], EXTCAM[5], EXTCAM[9], EXTCAM[13] );
-		printf( "%d %d %d %d    \n", EXTCAM[2], EXTCAM[6], EXTCAM[10], EXTCAM[14] );
-		printf( "%d %d %d %d    \n", EXTCAM[3], EXTCAM[7], EXTCAM[11], EXTCAM[15] );
-		printf( "%d %d\n", EXTCAM[16]/1024, EXTCAM[17] );
+		printf( "%d %d %d %d %d   \n", HID->PointerX, HID->PointerX2, HID->Screen[3][0], HID->GunBack[3][0], HID->GunTip[3][0] );
+		printf( "%d %d %d %d %d   \n", HID->PointerY, HID->PointerY2, HID->Screen[3][1], HID->GunBack[3][1], HID->GunTip[3][1] );
+		printf( "%d %d %d %d %d   \n", HID->PointerZ, HID->PointerZ2, HID->Screen[3][2], HID->GunBack[3][2], HID->GunTip[3][2] );
+		printf( "%d %d %d %d %d   \n", 0, 0, HID->Screen[3][3], HID->GunBack[3][3], HID->GunTip[3][3] );
+		printf( "%d   %d       \n", HID->TimeMS, HID->TriggerRight );
+		//printf( "%d %d\n", EXTCAM[16]/1024, EXTCAM[17] );
+		
+		
+		backscreendata[HID->PointerY * 16 / 4096 ][HID->PointerX * 32/4096 ] = 'X';
+		backscreendata[HID->PointerY2 * 16 / 4096][HID->PointerX2 * 32/4096] = 'O';
+//	HIDMatrix Screen;
+//	HIDMatrix GunStock;
+//	HIDMatrix GunTip;
 		pcont();
 	}	
 //	while(1);

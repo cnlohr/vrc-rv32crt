@@ -2,6 +2,7 @@ Shader "rv32im/backscreen"
 {
     Properties
     {
+		_MSDFTex ("MSDF Texture", 2DArray) = "white" {}
 		_SystemRam ("System RAM", 2D) = "white" {}
 		[Toggle(_ShowHex)] _ShowHex ("Show Hex", float) = 0.0
 		_WhichTerminal ("Which Terminal", int) = 0
@@ -13,6 +14,11 @@ Shader "rv32im/backscreen"
         {
 			Cull Back
 			CGPROGRAM
+
+			#define _UdonMSDFPrintf _MSDFTex
+			#define sampler_UdonMSDFPrintf sampler_MSDFTex
+			#define _UdonMSDFPrintf_TexelSize _MSDFTex_TexelSize
+
 			#pragma vertex vert
 			#pragma fragment frag
 			#pragma target 5.0
@@ -22,8 +28,8 @@ Shader "rv32im/backscreen"
 			#define _SelfTexture2D_TexelSize _SystemRam_TexelSize
 			
 			#include "UnityCG.cginc"
-			#include "../vrc-rv32im.cginc"
-			#include "../gpucache.h"
+			#include "vrc-rv32im.cginc"
+			#include "gpucache.h"
 			#include "/Assets/MSDFShaderPrintf/MSDFShaderPrintf.cginc"
 
 			uint _WhichTerminal;
@@ -100,7 +106,7 @@ Shader "rv32im/backscreen"
 			float4 frag (v2f i) : SV_Target
 			{
 				float2 uv = i.uv;
-				
+
 				uint2 termsize = i.termsize;
 
 				uv *= termsize;
@@ -131,5 +137,6 @@ Shader "rv32im/backscreen"
 			}
 			ENDCG
         }
+
     }
 }

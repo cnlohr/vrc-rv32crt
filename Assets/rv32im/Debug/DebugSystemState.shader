@@ -2,6 +2,7 @@
 {
 	Properties
 	{
+		_MSDFTex ("MSDF Texture", 2DArray) = "white" {}
 		_SystemMemory ("SystemMemory", 2D) = "white" {}
 		_CoreNo ("Core No", int) = 0
 	}
@@ -20,6 +21,10 @@
 			#pragma target 5.0
 
 			#include "UnityCG.cginc"
+
+			#define _UdonMSDFPrintf _MSDFTex
+			#define sampler_UdonMSDFPrintf sampler_MSDFTex
+			#define _UdonMSDFPrintf_TexelSize _MSDFTex_TexelSize
 
 //			#include "/Packages/com.llealloo.audiolink/Runtime/Shaders/SmoothPixelFont.cginc"
 			#include "/Assets/MSDFShaderPrintf/MSDFShaderPrintf.cginc"

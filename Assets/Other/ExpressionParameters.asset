@@ -17,39 +17,54 @@ MonoBehaviour:
     valueType: 0
     saved: 1
     defaultValue: 0
+    networkSynced: 1
   - name: VRCFaceBlendH
     valueType: 1
     saved: 1
     defaultValue: 0
+    networkSynced: 1
   - name: VRCFaceBlendV
     valueType: 1
     saved: 1
     defaultValue: 0
+    networkSynced: 1
   - name: LeftEyeLid
     valueType: 1
     saved: 1
     defaultValue: 0
+    networkSynced: 1
   - name: RightEyeLid
     valueType: 1
     saved: 1
     defaultValue: 0
+    networkSynced: 1
   - name: LeftEyeX
     valueType: 1
     saved: 1
     defaultValue: 0
+    networkSynced: 1
   - name: LeftEyeY
     valueType: 1
     saved: 1
     defaultValue: 0
+    networkSynced: 1
   - name: RightEyeX
     valueType: 1
     saved: 1
     defaultValue: 0
+    networkSynced: 1
   - name: RightEyeY
     valueType: 1
     saved: 1
     defaultValue: 0
+    networkSynced: 1
   - name: EnableOSCEyes
     valueType: 2
     saved: 1
     defaultValue: 0
+    networkSynced: 1
+  - name: TEST
+    valueType: 1
+    saved: 1
+    defaultValue: 0
+    networkSynced: 1

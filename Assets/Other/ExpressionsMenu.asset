@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: -340790334, guid: 67cc4cb7839cd3741b63733d5adf0442, type: 3}
   m_Name: ExpressionsMenu
   m_EditorClassIdentifier: 
+  Parameters: {fileID: 11400000, guid: fe36aa3129bb3614889d41e1b67f69b7, type: 2}
   controls:
   - name: EnableOSCEyes0
     icon: {fileID: 0}
@@ -22,4 +23,15 @@ MonoBehaviour:
     style: 0
     subMenu: {fileID: 0}
     subParameters: []
+    labels: []
+  - name: TEST
+    icon: {fileID: 0}
+    type: 203
+    parameter:
+      name: TEST
+    value: -0.52
+    style: 0
+    subMenu: {fileID: 0}
+    subParameters:
+    - name: 
     labels: []

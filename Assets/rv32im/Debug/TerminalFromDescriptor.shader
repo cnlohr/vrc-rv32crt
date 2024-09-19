@@ -4,6 +4,7 @@
 	{
 		_SystemRam ("System RAM", 2D) = "white" {}
 		[Toggle(_ShowHex)] _ShowHex ("Show Hex", float) = 0.0
+		_MSDFTex ("MSDF Texture", 2DArray) = "white" {}
 		_WhichTerminal ("Which Terminal", int) = 0
 	}
 	SubShader
@@ -21,6 +22,11 @@
 			#define _SelfTexture2D _SystemRam
 			#define _SelfTexture2D_TexelSize _SystemRam_TexelSize
 			
+			#define _UdonMSDFPrintf _MSDFTex
+			#define sampler_UdonMSDFPrintf sampler_MSDFTex
+			#define _UdonMSDFPrintf_TexelSize _MSDFTex_TexelSize
+
+
 			#include "UnityCG.cginc"
 			#include "../vrc-rv32im.cginc"
 			#include "../gpucache.h"

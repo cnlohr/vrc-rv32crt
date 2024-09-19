@@ -5,6 +5,14 @@ using UnityEngine.SceneManagement;
 using Unity.Collections;
 using UnityEditor;
 
+#if true
+
+public static class MSDFShaderPrintfAssignEditor
+{
+}
+
+#else
+	
 #if  !UDONSHARP
 [InitializeOnLoad]
 #endif
@@ -29,3 +37,4 @@ public static class MSDFShaderPrintfAssignEditor
 	}
 #endif
 }
+#endif

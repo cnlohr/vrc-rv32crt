@@ -27,6 +27,10 @@ Shader "Unlit/TextureMSDFPrint"
 			// make fog work
 			#pragma multi_compile_fog
 
+			#define _UdonMSDFPrintf _MSDFTex
+			#define sampler_UdonMSDFPrintf sampler_MSDFTex
+			#define _UdonMSDFPrintf_TexelSize _MSDFTex_TexelSize
+
 			#include "UnityCG.cginc"
 			#include "../MSDFShaderPrintf.cginc"
 			#include "Packages/com.llealloo.audiolink/Runtime/Shaders/AudioLink.cginc"

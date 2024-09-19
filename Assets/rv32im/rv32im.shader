@@ -30,6 +30,7 @@ Shader "rv32ima/rv32im-compute"
 			struct appdata
 			{
                 float4 vertex : POSITION;
+				uint	vertexID	: SV_VertexID;
 			};
 
 			struct v2f
@@ -42,7 +43,7 @@ Shader "rv32ima/rv32im-compute"
 			{
 				v2f o;
 				o.vertex = UnityObjectToClipPos(IN.vertex);
-				o.batchID = 0;
+				o.batchID = IN.vertexID / 6;
 				return o;
 			}
 			
@@ -313,9 +314,10 @@ Shader "rv32ima/rv32im-compute"
 							}
 							else if( rsval >= 0xf0000000 && rsval < 0xff000000 )
 							{
+								// Special control functionality.
 								rsval-=0xf0000000;
 								uint px = rsval / 16;
-								rval = _BackScreenFromCamera[uint2(px%256, 255-px/256)][(rsval/4)%4];
+								rval = _BackScreenFromCamera[uint2(px%16, 8-px/16)][(rsval/4)%4];
 							}
 							else
 							{

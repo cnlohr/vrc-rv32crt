@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 343138dfa63a0974aabee98f31fc4cd8
+guid: 4bfbcd660e77c484a9f6893188bb4bbc
 ShaderImporter:
   externalObjects: {}
   defaultTextures:
   - _MSDFTex: {instanceID: 0}
-  - _SystemMemory: {instanceID: 0}
+  - _SystemRam: {instanceID: 0}
   nonModifiableTextures: []
   userData: 
   assetBundleName: 
