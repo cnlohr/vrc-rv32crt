@@ -6,21 +6,47 @@
 
 #ifndef __ASSEMBLER__
 
+#define MAX_HOLO_OBJECTS 256
+#define MAX_HOLO_TVPEROBJECT 128
+
+struct holoTransform
+{
+	int32_t nX, nY, nZ, nS;
+	int32_t qW, qX, qY, qZ;
+} __attribute__((packed));
+
+struct holoSteamObject
+{
+	uint32_t nNumberOfTriangles;
+	uint32_t * pTriangleList;
+	uint32_t * pReserved1; // UNUSED
+	int nReserved1;        // UNUSED
+	
+	struct holoTransform * pXform1;
+	uint32_t * pReserved2; // UNUSED
+	struct holoTransform * pXform2;
+	uint32_t * pReserved3; // UNUSED
+} __attribute__((packed));
+
 struct Hardware
 {
-	uint32_t termsizeX;
-	uint32_t termsizeY;
-	uint32_t termscrollX;
-	uint32_t termscrollY;
-	uint32_t * termdata;
+	uint32_t nTermSizeX;
+	uint32_t nTermSizeY;
+	uint32_t nTermScrollX;
+	uint32_t nTermScrollY;
+	uint32_t * pTermData;
 	uint32_t res0[3];
 
-	uint32_t backscreenX;
-	uint32_t backscreenY;
-	uint32_t backscreenSX;
-	uint32_t backscreenSY;
-	uint32_t * backscreendata;
+	uint32_t nBackscreenX;
+	uint32_t nBackscreenY;
+	uint32_t nBackscreenSX;
+	uint32_t nBackscreenSY;
+	uint32_t * pBackscreenData;
 	uint32_t res1[3];
+	
+	// holostream matterator
+	uint32_t res2[4];
+	struct holoSteamObject * holostreamObjects[MAX_HOLO_OBJECTS];
 } __attribute__((packed));
 
 static inline void pcont(void) { asm volatile( ".word 0x02100073" : : : "memory" ); }

@@ -7,8 +7,8 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: rvtracked0
-  m_Shader: {fileID: 4800000, guid: ee6afcc7e26424343adaeb404417c95b, type: 3}
+  m_Name: HoloBrook
+  m_Shader: {fileID: 4800000, guid: 0f2a4ef25536d1441a6a67d908b2680f, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
@@ -43,6 +43,14 @@ Material:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    - _FlashMemory:
+        m_Texture: {fileID: 2800000, guid: 3844520be30a39c439b958f828c4ff6f, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MSDFTex:
+        m_Texture: {fileID: 18700000, guid: c622bfc8da5b0c445b672da4b018e73b, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - _MainTex:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
@@ -57,6 +65,10 @@ Material:
         m_Offset: {x: 0, y: 0}
     - _ParallaxMap:
         m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _SystemRam:
+        m_Texture: {fileID: 8600000, guid: 468f42af51579aa42b1f63e35ffc925c, type: 2}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     m_Ints: []
@@ -75,10 +87,6 @@ Material:
     - _SmoothnessTextureChannel: 0
     - _SpecularHighlights: 1
     - _SrcBlend: 1
-    - _TrackedID: 1
-    - _TrackedProperty0: 0
-    - _TrackedProperty1: 0
-    - _TrackedProperty2: 0
     - _UVSec: 0
     - _ZWrite: 1
     m_Colors:

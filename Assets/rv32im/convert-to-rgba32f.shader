@@ -17,8 +17,6 @@ Shader "rv32vrc/convert-rgba8-to-rgba32f"
 
             #pragma vertex vert
             #pragma fragment frag
-            // make fog work
-            #pragma multi_compile_fog
 
             #include "/Assets/flexcrt/flexcrt.cginc"
 

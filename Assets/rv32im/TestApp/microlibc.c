@@ -23,20 +23,20 @@ int _write( int desc, const uint8_t * str, int len )
 		}
 		else
 		{
-			termdata[cursory % hardwaredef.termsizeY][cursorx] = c;
+			termdata[cursory % hardwaredef.nTermSizeY][cursorx] = c;
 			cursorx++;
 		}
 		
-		if( cursorx == hardwaredef.termsizeX )
+		if( cursorx == hardwaredef.nTermSizeX )
 		{
 			cursorx = 0;
 			cursory++;
 		}
-		if( cursory == ( hardwaredef.termsizeY + hardwaredef.termscrollY ) )
+		if( cursory == ( hardwaredef.nTermSizeY + hardwaredef.nTermScrollY ) )
 		{
-			int looprow = ( hardwaredef.termsizeY + hardwaredef.termscrollY ) % hardwaredef.termsizeY;
-			hardwaredef.termscrollY++;
-			memset( termdata[looprow], 0, hardwaredef.termsizeX*4 );
+			int looprow = ( hardwaredef.nTermSizeY + hardwaredef.nTermScrollY ) % hardwaredef.nTermSizeY;
+			hardwaredef.nTermScrollY++;
+			memset( termdata[looprow], 0, hardwaredef.nTermSizeX*4 );
 		}
 	}
 }

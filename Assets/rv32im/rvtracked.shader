@@ -3,7 +3,8 @@ Shader "rv32im/rvtracked"
     Properties
     {
 		_TrackedID( "Tracked Object ID", float ) = 0
-		_TrackedProperty0( "Tracked Property 0", float ) = 0
+		_TrackedPropertyBase( "Tracked Property Base", float ) = 0
+		[ToggleUI] _TrackedPropertyBaseEnable( "Enable Tracked Property Base", float ) = 0
     }
     SubShader
     {
@@ -27,6 +28,7 @@ Shader "rv32im/rvtracked"
             {
                 float4 vertex : POSITION;
                 float2 uv : TEXCOORD0;
+				uint	vertexID	: SV_VertexID;
             };
 
             struct v2f
@@ -38,13 +40,14 @@ Shader "rv32im/rvtracked"
 
 			float _TrackedID;
 			float _TrackedProperty0;
+			float _TrackedPropertyBaseEnable;
 
             v2f vert (appdata v)
             {
                 v2f o;
 				
 				// If not the ingest camera, drop it.
-				if( _ScreenParams.x != 64 || _ScreenParams.y != 128 )
+				if( _ScreenParams.x != 64 || _ScreenParams.y != 128 || v.vertexID > 6 )
 				{
 					o.vertex = 0.0;
 					o.uv = 0.0;
@@ -73,7 +76,7 @@ Shader "rv32im/rvtracked"
 						depth = unity_ObjectToWorld[tp%4][tp/4] / ( 16777216.0 );
 						return 1.0;
 					}
-					if( iuv.x == uint(_TrackedID)*4 )
+					if( iuv.x == uint(_TrackedID)*4 && _TrackedPropertyBaseEnable > 0.5)
 					{
 						depth = _TrackedProperty0;
 						return 1.0;
@@ -87,7 +90,7 @@ Shader "rv32im/rvtracked"
 						depth = -unity_ObjectToWorld[tp%4][tp/4] / ( 16777216.0 );
 						return 1.0;
 					}
-					if( iuv.x == uint(_TrackedID)*4 )
+					if( iuv.x == uint(_TrackedID)*4 && _TrackedPropertyBaseEnable > 0.5 )
 					{
 						depth = -_TrackedProperty0;
 						return 1.0;

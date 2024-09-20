@@ -7,7 +7,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: rvtracked2
+  m_Name: rvtracked3
   m_Shader: {fileID: 4800000, guid: ee6afcc7e26424343adaeb404417c95b, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
@@ -75,12 +75,10 @@ Material:
     - _SmoothnessTextureChannel: 0
     - _SpecularHighlights: 1
     - _SrcBlend: 1
-    - _TrackedID: 2
-    - _TrackedProperty0: 0.26
+    - _TrackedID: 3
+    - _TrackedProperty0: 0
     - _TrackedProperty1: 0
     - _TrackedProperty2: 0
-    - _TrackedPropertyBase: 0
-    - _TrackedPropertyBaseEnable: 1
     - _UVSec: 0
     - _ZWrite: 1
     m_Colors:

@@ -10,21 +10,24 @@ uint32_t backscreendata[16][32] ALIGN;
 
 struct Hardware hardwaredef ALIGN = 
 {
-	.termsizeX = 80,
-	.termsizeY = 25,
-	.termscrollY = 0,
-	.termscrollX = 0,
-	.termdata = &termdata[0][0],
+	.nTermSizeX = 80,
+	.nTermSizeY = 25,
+	.nTermScrollX = 0,
+	.nTermScrollY = 0,
+	.pTermData = &termdata[0][0],
 
-	.backscreenX = 32,
-	.backscreenY = 16,
-	.backscreenSY = 0,
-	.backscreenSX = 0,
-	.backscreendata = &backscreendata[0][0],
+	.nBackscreenX = 32,
+	.nBackscreenY = 16,
+	.nBackscreenSX = 0,
+	.nBackscreenSY = 0,
+	.pBackscreenData = &backscreendata[0][0],
 };
 
 #include "microlibc.c"
 
+
+struct holoSteamObject hso;
+	
 void main( void )
 {
 	termdata[0][0] = 'X';	
@@ -33,6 +36,9 @@ void main( void )
 	int i;
 
 	backscreendata[0][0] = 'B';
+
+
+	hardwaredef.holostreamObjects[0] = &hso;
 
 	for( i = 0; ; i++ )
 	{
