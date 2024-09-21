@@ -437,3 +437,4 @@ int32_t pistol_Data[] = {
 };
 
 int pistol_Tris = 433;
+int pistol_Mode = 1;

@@ -214,7 +214,7 @@ int main( int argc, char ** argv )
 			thisLine[thisPlace++] = c;
 		}	
 	} while( 1 );
-	fprintf( fOut, "};\n\nint %s_Tris = %d;\n", argv[3], oTris );
+	fprintf( fOut, "};\n\nint %s_Tris = %d;\nint %s_Mode = %d;\n", argv[3], oTris, argv[3], mode );
 	return 0;
 }
 

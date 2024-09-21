@@ -3,44 +3,48 @@ test.elf:     file format elf32-littleriscv
 
 SYMBOL TABLE:
 80000000 l    d  .init	00000000 .init
-800000a4 l    d  .text	00000000 .text
-80001140 l    d  .fini	00000000 .fini
+800000a0 l    d  .text	00000000 .text
+8000117c l    d  .fini	00000000 .fini
 a0000000 l    d  .dalign	00000000 .dalign
-80001140 l    d  .dlalign	00000000 .dlalign
+8000117c l    d  .dlalign	00000000 .dlalign
 a0000000 l    d  .data	00000000 .data
-a0000480 l    d  .bss	00000000 .bss
+a0005700 l    d  .bss	00000000 .bss
 00000000 l    d  .riscv.attributes	00000000 .riscv.attributes
-00000000 l    df *ABS*	00000000 C:\Users\cnlohr\AppData\Local\Temp\ccqwsUAh.o
+00000000 l    df *ABS*	00000000 C:\Users\cnlohr\AppData\Local\Temp\ccOxuTk6.o
 8000000c l       .init	00000000 _start
 80000008 l       .init	00000000 _interrupttest
-80000080 l       .init	00000000 not_processor_zero
+8000007c l       .init	00000000 not_processor_zero
 00000000 l    df *ABS*	00000000 
-a0000580 l     O .bss	00001f40 termdata
-a0002500 l     O .bss	00000800 backscreendata
-800000a4 l     F .text	0000001c pcont
-a0000480 l     O .bss	00000004 cursorx
-a0000500 l     O .bss	00000004 cursory
-800000c0 l     F .text	00000044 __puts_uart
-80000b0c l     F .text	00000204 _write
-80000678 l     F .text	00000494 mini_vpprintf
-8000029c l     F .text	000001c0 mini_itoa
-8000045c l     F .text	00000148 mini_pad
-800005a4 l     F .text	000000d4 _puts
-a0002d00 l     O .bss	00000020 hso
-80000104  w    F .text	0000007c printf
-a0000c80 g       .data	00000000 __global_pointer$
-80000eac g     F .text	000001d4 otherharts
+a0000000 l     O .data	00005130 pistol_Data
+a0005600 l     O .data	00000004 pistol_Tris
+a0005680 l     O .data	00000004 pistol_Mode
+a0005800 l     O .bss	00001f40 termdata
+a0007780 l     O .bss	00000800 backscreendata
+800000a0 l     F .text	0000001c pcont
+a0005700 l     O .bss	00000004 cursorx
+a0005780 l     O .bss	00000004 cursory
+800000bc l     F .text	00000044 __puts_uart
+80000b08 l     F .text	000001cc _write
+80000674 l     F .text	00000494 mini_vpprintf
+80000298 l     F .text	000001c0 mini_itoa
+80000458 l     F .text	00000148 mini_pad
+800005a0 l     F .text	000000d4 _puts
+a0007f80 l     O .bss	00000020 hso
+a0008000 l     O .bss	00000020 pistolBase
+80000100  w    F .text	0000007c printf
+a0005e00 g       .data	00000000 __global_pointer$
+80000ee8 g     F .text	000001d4 otherharts
 80000000 g       .init	00000000 InterruptVector
-80000238  w    F .text	00000064 puts
-800000a4 g       .init	00000000 _einit
+80000234  w    F .text	00000064 puts
+800000a0 g       .init	00000000 _einit
 a0000000 g       .dalign	00000000 _data_vma
-800001d0  w    F .text	00000068 memset
-80000d10 g     F .text	0000019c main
-a0000000 g     O .data	00000450 hardwaredef
+800001cc  w    F .text	00000068 memset
+80000cd4 g     F .text	00000214 main
+a0005180 g     O .data	00000450 hardwaredef
 80000000 g       .init	00000000 _sinit
 a0100000 g       .bss	00000000 _eusrstack
-a0000480 g       .data	00000000 _edata
-80001140 g       .dlalign	00000000 _data_lma
-80000180  w    F .text	00000050 strlen
+a0005700 g       .data	00000000 _edata
+8000117c g       .dlalign	00000000 _data_lma
+8000017c  w    F .text	00000050 strlen
 
 

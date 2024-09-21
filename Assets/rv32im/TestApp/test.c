@@ -1,4 +1,5 @@
 #include <stdint.h>
+#include "pistol.h"
 
 // All hardware-accelerated structures must be 128-bit aligned.
 #define ALIGN __attribute__((aligned(128)))
@@ -27,7 +28,8 @@ struct Hardware hardwaredef ALIGN =
 
 
 struct holoSteamObject hso;
-	
+struct holoTransform pistolBase;
+
 void main( void )
 {
 	termdata[0][0] = 'X';	
@@ -39,6 +41,14 @@ void main( void )
 
 
 	hardwaredef.holostreamObjects[0] = &hso;
+	
+	hso.nNumberOfTriangles = pistol_Tris;
+	hso.nMode = pistol_Mode;
+	hso.pTriangleList = pistol_Data;
+	pistolBase.nS = 4096;
+	pistolBase.qW = 4096;
+	hso.pXform1 = &pistolBase;
+
 
 	for( i = 0; ; i++ )
 	{

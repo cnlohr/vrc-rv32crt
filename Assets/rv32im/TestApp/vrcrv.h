@@ -17,10 +17,12 @@ struct holoTransform
 
 struct holoSteamObject
 {
-	uint32_t nNumberOfTriangles;
+	uint16_t nNumberOfTriangles;
+	uint16_t nMode;
+	uint16_t nReserved;
+	uint16_t nReserved2;
 	uint32_t * pTriangleList;
 	uint32_t * pReserved1; // UNUSED
-	int nReserved1;        // UNUSED
 	
 	struct holoTransform * pXform1;
 	uint32_t * pReserved2; // UNUSED

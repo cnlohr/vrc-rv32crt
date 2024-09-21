@@ -74,7 +74,7 @@ Shader "Unlit/HoloBrook"
             }
 			
 			[maxvertexcount(96)] // 32 Triangles.
-			[instance(8)]
+			[instance(16)]
 			void geo(point v2g pin[1], inout TriangleStream<g2f> triStream, 
 				uint instanceID : SV_GSInstanceID, uint geoPrimID : SV_PrimitiveID )
 			{
