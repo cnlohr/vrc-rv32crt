@@ -70,7 +70,7 @@ int main( int argc, char ** argv )
 	switch( mode )
 	{
 		case 1:
-			fprintf( fOut, "#pragma once\n#include <stdint.h>\nint32_t %s_Data[] = {\n", argv[3] );
+			fprintf( fOut, "#pragma once\n#include <stdint.h>\nconst int32_t %s_Data[] ALIGN = {\n", argv[3] );
 			break;
 		default:
 			fprintf( stderr, "Error: Mode options:\n 1: Vertex Colors\n" );
@@ -214,7 +214,7 @@ int main( int argc, char ** argv )
 			thisLine[thisPlace++] = c;
 		}	
 	} while( 1 );
-	fprintf( fOut, "};\n\nint %s_Tris = %d;\nint %s_Mode = %d;\n", argv[3], oTris, argv[3], mode );
+	fprintf( fOut, "};\n\nconst int %s_Tris = %d;\nconst int %s_Mode = %d;\n", argv[3], oTris, argv[3], mode );
 	return 0;
 }
 

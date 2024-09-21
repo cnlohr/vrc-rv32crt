@@ -27,7 +27,12 @@ int main( int argc, char ** argv )
 	int h = ((len + (W*4-1))/4/W);
 	
 	uint8_t * data = calloc( W * 4, h );
-	fread( data, 1, W*h*4, fin );
+	int i;
+	for( i = 0; i < h; i++ )
+	{
+		//fread( &data[W*(h-i-1)*4], 1, W*4, fin );
+		fread( &data[W*i*4], 1, W*4, fin );
+	}
 	fclose( fin );
 
     int r = stbi_write_png( argv[2], W, h, 4, data, W*4 );

@@ -64,6 +64,7 @@
 			
 			uint LoadMemInternalRBNoCache( uint ptr )
 			{
+				ptr -= MINIRV32_RAM_IMAGE_OFFSET;
 				uint remainder4 = ((ptr&0xc)>>2);
 				uint4 ret = 0;
 				
@@ -90,13 +91,13 @@
 				uint advanced_descritptor = _SelfTexture2D[uint2(12, _SelfTexture2D_TexelSize.w - 1)].y;
 
 				o.advanced_descritptor = advanced_descritptor;
-				o.term = LoadMemInternalRB( advanced_descritptor - MINIRV32_RAM_IMAGE_OFFSET + 0x10 + _WhichTerminal * 0x20 ) - MINIRV32_RAM_IMAGE_OFFSET;
+				o.term = LoadMemInternalRB( advanced_descritptor + 0x10 + _WhichTerminal * 0x20 );
 				o.termsize = uint2(
-						LoadMemInternalRB( advanced_descritptor - MINIRV32_RAM_IMAGE_OFFSET + 0x00 + _WhichTerminal * 0x20 ),
-						LoadMemInternalRB( advanced_descritptor - MINIRV32_RAM_IMAGE_OFFSET + 0x04 + _WhichTerminal * 0x20 ) );
+						LoadMemInternalRB( advanced_descritptor + 0x00 + _WhichTerminal * 0x20 ),
+						LoadMemInternalRB( advanced_descritptor + 0x04 + _WhichTerminal * 0x20 ) );
 				o.termscroll = uint2(
-						LoadMemInternalRB( advanced_descritptor - MINIRV32_RAM_IMAGE_OFFSET + 0x08 + _WhichTerminal * 0x20 ),
-						LoadMemInternalRB( advanced_descritptor - MINIRV32_RAM_IMAGE_OFFSET + 0x0c + _WhichTerminal * 0x20 ) );
+						LoadMemInternalRB( advanced_descritptor + 0x08 + _WhichTerminal * 0x20 ),
+						LoadMemInternalRB( advanced_descritptor + 0x0c + _WhichTerminal * 0x20 ) );
 
 				UNITY_TRANSFER_FOG(o,o.vertex);
 				return o;
@@ -118,7 +119,6 @@
 
 			
 				uint u = LoadMemInternalRBNoCache( i.term + ( ( ( coord.x + i.termscroll.x ) % i.termsize.x ) * 4 ) + ( ( coord.y + i.termscroll.y ) % i.termsize.y ) * 4 * termsize.x );
-				
 				{
 					float2 tuv = float2( uv.x, 1.0 - uv.y );
 					//tuv.y = floor( tuv.y ) + frac( tuv.y ) * .9 + 0.1;

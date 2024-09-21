@@ -230,9 +230,9 @@ Shader "rv32ima/rv32im-compute"
 			uint32_t ir = 0;
 			rval = 0;
 			cycle++;
-			uint32_t ofs_pc = pc - MINIRV32_RAM_IMAGE_OFFSET;
+			uint32_t ofs_pc = pc;
 
-			if( ofs_pc >= MINI_RV32_RAM_SIZE )
+			if( ofs_pc - MINIRV32_RAM_IMAGE_OFFSET >= MINI_RV32_RAM_SIZE )
 			{
 				trap = 1 + 1;  // Handle access violation on instruction read.
 				break;
@@ -299,10 +299,9 @@ Shader "rv32ima/rv32im-compute"
 						int32_t imm_se = imm | (( imm & 0x800 )?0xfffff000:0);
 						uint32_t rsval = rs1 + imm_se;
 
-						rsval -= MINIRV32_RAM_IMAGE_OFFSET;
-						if( rsval >= MINI_RV32_RAM_SIZE-3 )
+						//rsval -= MINIRV32_RAM_IMAGE_OFFSET;
+						if( rsval - MINIRV32_RAM_IMAGE_OFFSET >= MINI_RV32_RAM_SIZE-3 )
 						{
-							rsval += MINIRV32_RAM_IMAGE_OFFSET;
 							if( rsval >= 0x10000000 && rsval < 0x12000000 )  // UART, CLNT
 							{
 								if( rsval == 0x1100bffc ) // https://chromitem-soc.readthedocs.io/en/latest/clint.html
@@ -385,12 +384,11 @@ Shader "rv32ima/rv32im-compute"
 						uint32_t rs2 = REG((ir >> 20) & 0x1f);
 						uint32_t addy = ( ( ir >> 7 ) & 0x1f ) | ( ( ir & 0xfe000000 ) >> 20 );
 						if( addy & 0x800 ) addy |= 0xfffff000;
-						addy += rs1 - MINIRV32_RAM_IMAGE_OFFSET;
+						addy += rs1;
 						rdid = 0;
 
-						if( addy >= MINI_RV32_RAM_SIZE-3 )
+						if( addy - MINIRV32_RAM_IMAGE_OFFSET >= MINI_RV32_RAM_SIZE-3 )
 						{
-							addy += MINIRV32_RAM_IMAGE_OFFSET;
 							if( addy >= 0x10000000 && addy < 0x12000000 )
 							{
 								// Should be stuff like SYSCON, 8250, CLNT

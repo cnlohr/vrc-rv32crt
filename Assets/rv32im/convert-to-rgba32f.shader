@@ -33,7 +33,6 @@ Shader "rv32vrc/convert-rgba8-to-rgba32f"
             };
 
 			Texture2D<float4> _MainTex;
-			float4 _MainTex_TexelSize;
 
             v2f vert (appdata v)
             {
@@ -46,11 +45,22 @@ Shader "rv32vrc/convert-rgba8-to-rgba32f"
 
             uint4 frag (v2f i) : SV_Target
             {
-				uint2 ocoord = i.uv * _CustomRenderTextureInfo.xy;
-				//ocoord.y = _CustomRenderTextureInfo.y - ocoord.y - 1;  //(For now, don't, flip Y)
 				uint2 idim;
 				uint dummy;
 				_MainTex.GetDimensions( 0, idim.x, idim.y, dummy );
+				
+				uint offsetY = _CustomRenderTextureInfo.y - idim.y;
+				uint2 ocoord = i.uv * _CustomRenderTextureInfo.xy;
+				//ocoord.y = _CustomRenderTextureInfo.y - ocoord.y - 1;  //(For now, don't, flip Y)
+				
+				// idim.y = 4
+				// _CustomRenderTextureInfo.y = 16
+				
+				ocoord.y -= idim.y;
+				ocoord.y = -ocoord.y-1;
+				//ocoord.y = ocoord.y;
+				//ocoord.y += offsetY;
+				//return uint( -ocoord.y );
 
 				uint wordno = ( ocoord.y * _CustomRenderTextureInfo.x + ocoord.x ) * 4;
 				uint2 coord = uint2( wordno % idim.x, wordno / idim.x );

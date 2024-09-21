@@ -3,6 +3,8 @@
 
 #define PCONT	.word 0x02100073
 
+// All hardware-accelerated structures must be 128-bit aligned.
+#define ALIGN __attribute__((aligned(16)))
 
 #ifndef __ASSEMBLER__
 
@@ -11,7 +13,7 @@
 
 struct holoTransform
 {
-	int32_t nX, nY, nZ, nS;
+	int32_t tX, tY, tZ, S;
 	int32_t qW, qX, qY, qZ;
 } __attribute__((packed));
 
@@ -21,13 +23,13 @@ struct holoSteamObject
 	uint16_t nMode;
 	uint16_t nReserved;
 	uint16_t nReserved2;
-	uint32_t * pTriangleList;
-	uint32_t * pReserved1; // UNUSED
+	const uint32_t * pTriangleList;
+	const uint32_t * pReserved1; // UNUSED
 	
 	struct holoTransform * pXform1;
-	uint32_t * pReserved2; // UNUSED
+	const uint32_t * pReserved2; // UNUSED
 	struct holoTransform * pXform2;
-	uint32_t * pReserved3; // UNUSED
+	const uint32_t * pReserved3; // UNUSED
 } __attribute__((packed));
 
 struct Hardware

@@ -1,13 +1,11 @@
 #include <stdint.h>
-#include "pistol.h"
 
-// All hardware-accelerated structures must be 128-bit aligned.
-#define ALIGN __attribute__((aligned(128)))
+#include "vrcrv.h"
 
 uint32_t termdata[25][80] ALIGN;
 uint32_t backscreendata[16][32] ALIGN;
 
-#include "vrcrv.h"
+#include "pistol.h"
 
 struct Hardware hardwaredef ALIGN = 
 {
@@ -27,8 +25,8 @@ struct Hardware hardwaredef ALIGN =
 #include "microlibc.c"
 
 
-struct holoSteamObject hso;
-struct holoTransform pistolBase;
+struct holoSteamObject hso ALIGN;
+struct holoTransform pistolBase ALIGN;
 
 void main( void )
 {
@@ -39,16 +37,11 @@ void main( void )
 
 	backscreendata[0][0] = 'B';
 
-
-	hardwaredef.holostreamObjects[0] = &hso;
-	
+	hardwaredef.holostreamObjects[0] = &hso;	
 	hso.nNumberOfTriangles = pistol_Tris;
 	hso.nMode = pistol_Mode;
 	hso.pTriangleList = pistol_Data;
-	pistolBase.nS = 4096;
-	pistolBase.qW = 4096;
 	hso.pXform1 = &pistolBase;
-
 
 	for( i = 0; ; i++ )
 	{
@@ -71,6 +64,7 @@ void main( void )
 //	HIDMatrix Screen;
 //	HIDMatrix GunStock;
 //	HIDMatrix GunTip;
+
 		pcont();
 	}	
 //	while(1);
@@ -82,6 +76,12 @@ void otherharts( int hartid )
 	int k = hartid;
 	while(1)
 	{
+		
+		pistolBase.S = 4096;
+		pistolBase.tX = 4096;
+		pistolBase.qW = 4096;
+		if( pistolBase.tX > 8192 ) pistolBase.tX = 0;
+
 		k++;
 		backscreendata[hartid/8][(hartid%8)*4+0] = '0' + ((k/1000)%10);
 		backscreendata[hartid/8][(hartid%8)*4+1] = '0' + ((k/100)%10);

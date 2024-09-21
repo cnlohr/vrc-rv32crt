@@ -30,7 +30,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _CheckTexture:
-        m_Texture: {fileID: 8600000, guid: 6a7266dbf005eca448b2e95003741dc3, type: 2}
+        m_Texture: {fileID: 8600000, guid: 1283d5d7b302bdb4e915c64ef747942a, type: 2}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _DetailAlbedoMap:
@@ -87,7 +87,7 @@ Material:
     - _HexDisplay: 0
     - _Metallic: 0
     - _Mode: 0
-    - _NoflipTexture: 0
+    - _NoflipTexture: 1
     - _OcclusionStrength: 1
     - _OffsetX: 0
     - _OffsetY: 0

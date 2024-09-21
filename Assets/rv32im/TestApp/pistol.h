@@ -1,6 +1,6 @@
 #pragma once
 #include <stdint.h>
-int32_t pistol_Data[] = {
+const int32_t pistol_Data[] ALIGN = {
 	    -24,     85,    586, 0x01659eff,      -1,     70,    590, 0x01699afe,       1,     93,    584, 0x01659eff, 
 	    -34,     65,    -61, 0x01659eff,     -33,     66,   -211, 0x01659eff,     -63,     36,    590, 0x01699afe, 
 	    -70,      5,   -211, 0x01659eff,     -63,     36,    590, 0x01699afe,     -60,     40,   -211, 0x01659eff, 
@@ -436,5 +436,5 @@ int32_t pistol_Data[] = {
 	     14,   -399,   -148, 0x01595959,       2,   -400,   -160, 0x01595959,     -14,   -400,   -156, 0x01595959, 
 };
 
-int pistol_Tris = 433;
-int pistol_Mode = 1;
+const int pistol_Tris = 433;
+const int pistol_Mode = 1;

@@ -23,10 +23,29 @@
 					case 3: vv.w = val; break;
 				}
 			}
+			
+			uint4 LoadMemInternalBlockNoCache( uint ptr )
+			{
+				uint4 ret;
+				ptr -= MINIRV32_RAM_IMAGE_OFFSET;
+				if( ptr < MEMORY_SPLIT )
+				{
+					uint blockno = ptr >> 4;
+					ret = FlashSystemAccess( blockno );	
+				}
+				else
+				{
+					ptr -= MEMORY_SPLIT;
+					uint blockno = ptr >> 4;
+					ret = MainSystemAccess( blockno );
+				}
+				return ret;
+			}
 
 			// Only use if aligned-to-4-bytes.
 			uint LoadMemInternalRB( uint ptr )
-			{				
+			{
+				ptr -= MINIRV32_RAM_IMAGE_OFFSET;
 				uint remainder4 = ((ptr&0xc)>>2);
 				uint4 ret = 0;
 				
@@ -67,6 +86,7 @@
 			// Store mem internal word (Only use if guaranteed word-alignment)
 			void StoreMemInternalRB( uint ptr, uint val )
 			{
+				ptr -= MINIRV32_RAM_IMAGE_OFFSET;
 				ptr -= MEMORY_SPLIT;
 				uint ptrleftover = (ptr & 0xc)>>2;
 				//printf( "STORE %08x %08x\n", ptr, val );

@@ -65,6 +65,7 @@ Shader "rv32im/backscreen"
 			
 			uint LoadMemInternalRBNoCache( uint ptr )
 			{
+				ptr -= MINIRV32_RAM_IMAGE_OFFSET;
 				uint remainder4 = ((ptr&0xc)>>2);
 				uint4 ret = 0;
 				
@@ -91,13 +92,13 @@ Shader "rv32im/backscreen"
 				uint advanced_descritptor = _SelfTexture2D[uint2(12, _SelfTexture2D_TexelSize.w - 1)].y;
 
 				o.advanced_descritptor = advanced_descritptor;
-				o.term = LoadMemInternalRB( advanced_descritptor - MINIRV32_RAM_IMAGE_OFFSET + 0x10 + _WhichTerminal * 0x20 ) - MINIRV32_RAM_IMAGE_OFFSET;
+				o.term = LoadMemInternalRB( advanced_descritptor + 0x10 + _WhichTerminal * 0x20 );
 				o.termsize = uint2(
-						LoadMemInternalRB( advanced_descritptor - MINIRV32_RAM_IMAGE_OFFSET + 0x00 + _WhichTerminal * 0x20 ),
-						LoadMemInternalRB( advanced_descritptor - MINIRV32_RAM_IMAGE_OFFSET + 0x04 + _WhichTerminal * 0x20 ) );
+						LoadMemInternalRB( advanced_descritptor + 0x00 + _WhichTerminal * 0x20 ),
+						LoadMemInternalRB( advanced_descritptor + 0x04 + _WhichTerminal * 0x20 ) );
 				o.termscroll = uint2(
-						LoadMemInternalRB( advanced_descritptor - MINIRV32_RAM_IMAGE_OFFSET + 0x08 + _WhichTerminal * 0x20 ),
-						LoadMemInternalRB( advanced_descritptor - MINIRV32_RAM_IMAGE_OFFSET + 0x0c + _WhichTerminal * 0x20 ) );
+						LoadMemInternalRB( advanced_descritptor + 0x08 + _WhichTerminal * 0x20 ),
+						LoadMemInternalRB( advanced_descritptor + 0x0c + _WhichTerminal * 0x20 ) );
 
 				UNITY_TRANSFER_FOG(o,o.vertex);
 				return o;
