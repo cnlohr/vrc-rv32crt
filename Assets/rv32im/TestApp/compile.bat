@@ -1,3 +1,6 @@
+tcc objtoh.c -o objtoh.exe
+objtoh pistol.obj pistol.h pistol 4096 1
+
 riscv64-unknown-elf-gcc -T vrc-rv32im.lds  -Wl,--gc-sections -Wl,--print-memory-usage  -nostdlib -static-libgcc -ffunction-sections -fdata-sections -flto -march=rv32im -mabi=ilp32  test.S test.c -o test.elf
 riscv64-unknown-elf-objdump -S test.elf > test.lst
 riscv64-unknown-elf-objdump -t test.elf > test.map
