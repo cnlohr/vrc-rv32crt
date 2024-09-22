@@ -2,6 +2,8 @@
 
 #include "vrcrv.h"
 
+int booted ALIGN;
+
 uint32_t termdata[25][80] ALIGN;
 uint32_t backscreendata[16][32] ALIGN;
 
@@ -33,6 +35,7 @@ void main( void )
 
 	backscreendata[0][0] = 'B';
 
+	booted = 1;
 
 	for( i = 0; ; i++ )
 	{
@@ -69,46 +72,60 @@ void eulertoquat( int x, int y, int z, int32_t * quat )
 }
 
 
-struct holoSteamObject hso ALIGN;
-struct holoTransform pistolBase0 ALIGN;
-struct holoTransform pistolBase1 ALIGN;
+struct holoSteamObject hso[256] ALIGN;
+struct holoTransform pistolBase0[256] ALIGN;
+struct holoTransform pistolBase1[256] ALIGN;
 
 void otherharts( int hartid )
 {
 	int k = hartid;
 	int i;
 	
-	if( hartid == 1 )
-	{
-		hardwaredef.holostreamObjects[0] = &hso;	
-		hso.nNumberOfTriangles = pistol_Tris;
-		hso.pTriangleList = pistol_Data;
-		hso.nMode = pistol_Mode;
-		
-		hso.nTransMode0 = 1;
-		hso.nTransMode1 = 2;
-		
-		hso.pXform0 = &pistolBase0;
-		hso.pXform1 = &pistolBase1;
-
-		pistolBase0.tq.S = 4096;
-		pistolBase1.tq.S = 4096;
-		
-		pistolBase0.tq.qW = 4096;
-		pistolBase0.tq.tX = 4096;
-	}
+	while( !booted );
 	
+	for( i = 0; i < hartid*2; i++ )
+		pcont();
+
+	for( i = 0; i < 4; i++ )
+	{
+		struct holoSteamObject * ho = &hso[hartid*4+i];
+		hardwaredef.holostreamObjects[hartid * 4+i] = ho;	
+		ho->nNumberOfTriangles = pistol_Tris;
+		ho->pTriangleList = pistol_Data;
+		ho->nMode = pistol_Mode;
+		
+		ho->nTransMode0 = 2;
+		ho->nTransMode1 = 2;
+		
+		ho->pXform0 = &pistolBase0[hartid * 4 + i];
+		ho->pXform1 = &pistolBase1[hartid * 4 + i];
+
+		pistolBase0[hartid * 4 + i].tq.S = 4096*5;
+		pistolBase1[hartid * 4 + i].tq.S = 4096;
+		pistolBase0[hartid * 4 + i].tq.qW = 4096;
+		pistolBase0[hartid * 4 + i].tq.tX = 4096 * 2;
+
+		pistolBase1[hartid * 4 + i].tq.tY = 2048;
+	}
+	int torque = 4;
 	while(1)
 	{
 		//pistolBase.tq.qW = 4096-i;
-		if( hartid == 1 )
+		//if( hartid == 1 )
+		if( HID->PointerZ > 100 ) torque = HID->PointerX>>2;
+	
+		for( i = 0; i < 4; i++ )
 		{
-			pistolBase1.te.rX = i;
-			pistolBase1.te.rY = i;
-			pistolBase1.te.rZ = i;
-			i += 1;
-			if( i > 4096 ) i = 0;
+			struct holoSteamObject * ho = &hso[hartid*4+i];
+			ho->pXform1->te.rX = k+i*16 + hartid * 64;
+			ho->pXform1->te.rY = k+i*16 + hartid * 64 + 1024*3;
+			ho->pXform1->te.rZ = k+i*16 + hartid * 64;
+
+			ho->pXform0->te.rX = k+i*torque + hartid * torque*4;
+			ho->pXform0->te.rY = k+i*torque + hartid * torque*4;
+			ho->pXform0->te.rZ = k+i*torque + hartid * torque*4;
 		}
+		if( k > 4096 ) k = 0;
 
 		k++;
 		backscreendata[hartid/8][(hartid%8)*4+0] = '0' + ((k/1000)%10);

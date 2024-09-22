@@ -124,7 +124,7 @@ Shader "rv32ima/rv32im-compute"
 			}
 			
 			[maxvertexcount(128)]
-			[instance(CORES)]
+			[instance(CORESPHY)]
 			void geo( point v2g input[1], inout PointStream<g2f> stream,
 				uint instanceID : SV_GSInstanceID, uint geoPrimID : SV_PrimitiveID )
 			{
@@ -145,9 +145,9 @@ Shader "rv32ima/rv32im-compute"
 //			
 //				return;
 			
-				uint thisCore = instanceID;
+				uint thisCore = instanceID * CORESHYPER + geoPrimID;
 
-				if( geoPrimID != 0 ) return;
+				if( geoPrimID >= CORESHYPER ) return;
 
 				uint pixelOutputID = 0;
 				uint elapsedUs = _ElapsedTime * 1000000;

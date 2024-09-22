@@ -95,8 +95,8 @@ Material:
     - _SmoothnessTextureChannel: 0
     - _SpecularHighlights: 1
     - _SrcBlend: 1
-    - _SuperColumns: 12
-    - _SuperLines: 9
+    - _SuperColumns: 7
+    - _SuperLines: 5
     - _UVSec: 0
     - _ZWrite: 1
     m_Colors:

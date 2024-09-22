@@ -117,20 +117,23 @@ Shader "Unlit/HoloBrook"
 				float zz = 2 * q[3] * q[3];
 				float zw = 2 * q[3] * q[0];
 				
+				float scaleX, scaleY, scaleZ;
+				scaleX = scaleY = scaleZ = transcale.w;
+				
 				return float4x4(
-					1 - yy - zz,
-					xy - zw,
-					xz + yw,
+					scaleX * (1 - yy - zz),
+					scaleX * (xy - zw),
+					scaleX * (xz + yw),
 					transcale.x,				
 			
-					xy + zw,
-					1 - xx - zz,
-					yz - xw,
+					scaleY * (xy + zw),
+					scaleY * (1 - xx - zz),
+					scaleY * (yz - xw),
 					transcale.y,
 
-					xz - yw,
-					yz + xw,
-					1 - xx - yy,
+					scaleZ * (xz - yw),
+					scaleZ * (yz + xw),
+					scaleZ * (1 - xx - yy),
 					transcale.z,
 
 					0,
@@ -276,7 +279,7 @@ Shader "Unlit/HoloBrook"
 				if( mode == 1 )
 				{
 					col = float4( i.uv.rgb / 255.0, 1.0 );
-					col *= 0.8 * dot( -normalize( i.norm ), _WorldSpaceLightPos0.xyz ) + 0.2;
+					col *= 0.5 * dot( -normalize( i.norm ), _WorldSpaceLightPos0.xyz ) + 0.5;
 				}
                 UNITY_APPLY_FOG(i.fogCoord, col);
                 return col;

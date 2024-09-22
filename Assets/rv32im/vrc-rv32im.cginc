@@ -37,8 +37,9 @@ float4 _FlashMemory_TexelSize;
 
 // Cores only take 13 uint4's, but, we should pretend they take a whole line to provide a short-cut stack, or processor-local data.
 // Processor state takes up 208 bytes.
-#define CORES 32
-
+#define CORESPHY 32
+#define CORESHYPER 2
+#define CORES (CORESHYPER * CORESPHY)
 
 float4 _GeneralArray[1023];
 float4 _PlayerArray[1023];
