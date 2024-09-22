@@ -42,16 +42,15 @@ void main( void )
 		cursorx = 0;
 		cursory = 2;
 		printf( "%d\n", i );
-		//printf( "%d %d %d %d %d   \n", HID->PointerX, HID->PointerX2, HID->Screen[3][0], HID->GunBack[3][0], HID->GunTip[3][0] );
-		//printf( "%d %d %d %d %d   \n", HID->PointerY, HID->PointerY2, HID->Screen[3][1], HID->GunBack[3][1], HID->GunTip[3][1] );
-		//printf( "%d %d %d %d %d   \n", HID->PointerZ, HID->PointerZ2, HID->Screen[3][2], HID->GunBack[3][2], HID->GunTip[3][2] );
-		//printf( "%d %d %d %d %d   \n", 0, 0, HID->Screen[3][3], HID->GunBack[3][3], HID->GunTip[3][3] );
-		printf( "%d %d    \n", HID->PointerX, HID->PointerX2 );
-		printf( "%d %d    \n", HID->PointerY, HID->PointerY2 );
-		printf( "%d %d    \n", HID->PointerZ, HID->PointerZ2 );
-		printf( "%d   %d       \n", HID->TimeMS, HID->TriggerRight );
+		printf( "%d %d %d %d    \n", HID->PointerX, HID->PointerX2, HID->AvatarBase[3][0], HID->Screen[3][0] );
+		printf( "%d %d %d %d    \n", HID->PointerY, HID->PointerY2, HID->AvatarBase[3][1], HID->Screen[3][1] );
+		printf( "%d %d %d %d    \n", HID->PointerZ, HID->PointerZ2, HID->AvatarBase[3][2], HID->Screen[3][2] );
+		printf( "%d %d %d %d    \n", 0, 0, HID->AvatarBase[3][3], HID->Screen[3][3] );
+		//printf( "%d %d    \n", HID->PointerX, HID->PointerX2 );
+		//printf( "%d %d    \n", HID->PointerY, HID->PointerY2 );
+		//printf( "%d %d    \n", HID->PointerZ, HID->PointerZ2 );
+		printf( "%d   %d     %d  \n", HID->TimeMS, HID->TriggerRight, HID->AvatarBase[0][0] );
 		//printf( "%d %d\n", EXTCAM[16]/1024, EXTCAM[17] );
-		
 		
 		backscreendata[HID->PointerY * 16 / 4096 ][HID->PointerX * 32/4096 ] = 'X';
 		backscreendata[HID->PointerY2 * 16 / 4096][HID->PointerX2 * 32/4096] = 'O';
@@ -83,7 +82,7 @@ void otherharts( int hartid )
 	
 	while( !booted );
 	
-	for( i = 0; i < hartid*2; i++ )
+	for( i = 0; i < hartid; i++ )
 		pcont();
 
 	for( i = 0; i < 4; i++ )
@@ -96,9 +95,11 @@ void otherharts( int hartid )
 		
 		ho->nTransMode0 = 2;
 		ho->nTransMode1 = 2;
+		ho->nTransMode2 = 3;
 		
 		ho->pXform0 = &pistolBase0[hartid * 4 + i];
 		ho->pXform1 = &pistolBase1[hartid * 4 + i];
+		ho->pXform2 = (struct holoTransform *)&HID->AvatarBase[0][0];
 
 		pistolBase0[hartid * 4 + i].tq.S = 4096*5;
 		pistolBase1[hartid * 4 + i].tq.S = 4096;
@@ -112,7 +113,7 @@ void otherharts( int hartid )
 	{
 		//pistolBase.tq.qW = 4096-i;
 		//if( hartid == 1 )
-		if( HID->PointerZ > 100 ) torque = HID->PointerX>>2;
+		if( HID->PointerZ > 100 ) torque = HID->PointerX>>3;
 	
 		for( i = 0; i < 4; i++ )
 		{

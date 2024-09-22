@@ -33,11 +33,17 @@
 					uint blockno = ptr >> 4;
 					ret = FlashSystemAccess( blockno );	
 				}
-				else
+				else if( ptr < 0x70000000 )
 				{
 					ptr -= MEMORY_SPLIT;
 					uint blockno = ptr >> 4;
 					ret = MainSystemAccess( blockno );
+				}
+				else
+				{
+					ptr -= 0x70000000;
+					uint px = ptr >> 4;
+					ret = _BackScreenFromCamera[uint2(px%16, 8-px/16)];
 				}
 				return ret;
 			}

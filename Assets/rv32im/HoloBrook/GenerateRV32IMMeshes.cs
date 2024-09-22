@@ -22,7 +22,7 @@ public class GenerateRV32IMMeshes : MonoBehaviour
 		AssetDatabase.CreateAsset(mesh, "Assets/rv32im/HoloBrook/HoloBrook-Geo.asset");
 
 		mesh = new Mesh();
-		mesh.vertices = new Vector3[6] { new Vector3( -1, -1, -1 ), new Vector3( -1, 1, -1 ), new Vector3( 1, -1, 1 ), new Vector3( 1, 1, 1 ), new Vector3( 1, -1, -1 ), new Vector3( -1, 1, 1 ) };
+		mesh.vertices = new Vector3[6] { new Vector3( -.1f, -.1f, -.1f ), new Vector3( -.1f, .1f, -.1f ), new Vector3( .1f, -.1f, .1f ), new Vector3( .1f, .1f, .1f ), new Vector3( .1f, -.1f, -.1f ), new Vector3( -.1f, .1f, .1f ) };
 		mesh.uv = new Vector2[6] { new Vector2( 0, 0 ), new Vector2( 1, 0 ), new Vector2( 0, 1 ), new Vector2( 1, 0 ), new Vector2( 0, 1 ), new Vector2( 1, 1 ) };
 		mesh.bounds = new Bounds(new Vector3(0, 0, 0), new Vector3(5, 5, 5));
 		int[] indices = new int[6] { 0, 1, 2, 3, 4, 5 };

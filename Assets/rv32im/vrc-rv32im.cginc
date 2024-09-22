@@ -6,6 +6,7 @@
 #define CACHE_BLOCKS 128
 #define CACHE_N_WAY  4
 
+Texture2D<uint4> _BackScreenFromCamera;
 Texture2D<uint4> _FlashMemory;
 float4 _FlashMemory_TexelSize;
 
@@ -32,8 +33,8 @@ float4 _FlashMemory_TexelSize;
 // Farsical memory size, mostly so we can deal with whatever in the cache system. (Was (SYSTEX_SIZE_X*SYSTEX_SIZE_Y*16 - SYSTEX_SIZE_X*16) )
 #define MINI_RV32_RAM_SIZE 0x40000000 //Ram + Flash
 #define MEMORY_SIZE (MINI_RV32_RAM_SIZE)
-#define MINIRV32_RAM_IMAGE_OFFSET  0x80000000
-#define MEMORY_SPLIT 0x20000000
+#define MINIRV32_RAM_IMAGE_OFFSET   0x80000000
+#define MEMORY_SPLIT     0x20000000
 
 // Cores only take 13 uint4's, but, we should pretend they take a whole line to provide a short-cut stack, or processor-local data.
 // Processor state takes up 208 bytes.

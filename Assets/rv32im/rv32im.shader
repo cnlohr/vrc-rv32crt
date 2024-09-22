@@ -93,7 +93,6 @@ Shader "rv32ima/rv32im-compute"
 			uint _SingleStepGo;
 			uint _SingleStep;
 			float _ElapsedTime;
-			Texture2D<uint4> _BackScreenFromCamera;
 
 			#include "vrc-rv32im.cginc"			
 			#include "gpucache.h"

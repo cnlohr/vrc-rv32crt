@@ -4,6 +4,7 @@ Shader "Unlit/HoloBrook"
     {
 		_FlashMemory( "Flash Memory", 2D ) = "black" { }
 		_SystemRam ("System RAM", 2D) = "white" {}
+		_BackScreenFromCamera( "Back Screen From Camera", 2D) = "black" { }
 		_MSDFTex ("MSDF Texture", 2DArray) = "white" {}
     }
     SubShader
@@ -72,14 +73,14 @@ Shader "Unlit/HoloBrook"
 				if( mode == 1 )
 				{
 					uint4 intTS = LoadMemInternalBlockNoCache( ptr );
-					uint4 intQ = LoadMemInternalBlockNoCache( ptr + 16 );
+					uint4 intQ  = LoadMemInternalBlockNoCache( ptr + 16 );
 					transcale = intTS * 1.0 / 4096.0;
 					q = intQ;
 				}
 				else if( mode == 2 )
 				{
 					uint4 intTS = LoadMemInternalBlockNoCache( ptr );
-					uint4 intQ = LoadMemInternalBlockNoCache( ptr + 16 );
+					uint4 intQ  = LoadMemInternalBlockNoCache( ptr + 16 );
 					transcale = intTS * 1.0 / 4096.0;
 					
 					
@@ -99,6 +100,20 @@ Shader "Unlit/HoloBrook"
 					q[1] = sx * cy * cz - cx * sy * sz; // q2
 					q[2] = cx * sy * cz + sx * cy * sz; // q3
 					q[3] = cx * cy * sz - sx * sy * cz; // q4
+				}
+				else if( mode == 3 )
+				{
+					int4 blk0 = LoadMemInternalBlockNoCache( ptr );
+					int4 blk1 = LoadMemInternalBlockNoCache( ptr + 16 );
+					int4 blk2 = LoadMemInternalBlockNoCache( ptr + 32 );
+					int4 blk3 = LoadMemInternalBlockNoCache( ptr + 48 );
+					//if( blk3.w > 4095 )
+					//	return float4x4( 1, 0, 0, 0,  0, 1, 0, 0,  0, 0, 1, 0,  0, 0, 0, 1 );				
+					float4 i0 = ((float4)blk0) * 1.0 / 4096.0;
+					float4 i1 = ((float4)blk1) * 1.0 / 4096.0;
+					float4 i2 = ((float4)blk2) * 1.0 / 4096.0;
+					float4 i3 = ((float4)blk3) * 1.0 / 4096.0;
+					return transpose( float4x4( i0, i1, i2, i3 ) );
 				}
 
 				q = normalize( q );
@@ -141,7 +156,7 @@ Shader "Unlit/HoloBrook"
 					0,
 					1 );
 			
-				//return float4x4( 1, 0, 0, 0,  0, 1, 0, 0,  0, 0, 1, 0,  0, 0, 0, 1 );				
+				//return float4x4( 1, 0, 0, 0,  0, 1, 0, 0,  0, 0, 1, 0,  0, 0, 0, 1 );
 			}
 			
 
@@ -254,15 +269,15 @@ Shader "Unlit/HoloBrook"
 
 					o.norm = cross( pTC.xyz - pTA.xyz, pTB.xyz - pTA.xyz );
 					
-					o.vertex = UnityObjectToClipPos( float4( pTA.xyz * rescale, 1 ) );
+					o.vertex = mul(UNITY_MATRIX_VP, float4( pTA.xyz * rescale, 1 ) );
 					o.uv = float4( pdTA.w&0xff, (pdTA.w>>8)&0xff, (pdTA.w>>16)&0xff, (pdTA.w>>24)&0xff );
 					UNITY_TRANSFER_FOG(o,o.vertex);
 					triStream.Append(o);
-					o.vertex = UnityObjectToClipPos( float4( pTB.xyz * rescale, 1 ) );
+					o.vertex = mul(UNITY_MATRIX_VP, float4( pTB.xyz * rescale, 1 ) );
 					o.uv = float4( pdTB.w&0xff, (pdTB.w>>8)&0xff, (pdTB.w>>16)&0xff, (pdTB.w>>24)&0xff );
 					UNITY_TRANSFER_FOG(o,o.vertex);
 					triStream.Append(o);
-					o.vertex = UnityObjectToClipPos( float4( pTC.xyz * rescale, 1 ) );
+					o.vertex = mul(UNITY_MATRIX_VP, float4( pTC.xyz * rescale, 1 ) );
 					o.uv = float4( pdTC.w&0xff, (pdTC.w>>8)&0xff, (pdTC.w>>16)&0xff, (pdTC.w>>24)&0xff );
 					UNITY_TRANSFER_FOG(o,o.vertex);
 					triStream.Append(o);

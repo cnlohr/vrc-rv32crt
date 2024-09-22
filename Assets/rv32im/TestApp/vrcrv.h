@@ -94,9 +94,8 @@ struct HardwareInput
 	uint32_t TriggerRight;
 	uint32_t res5;
 	uint32_t res6[4];
+	HIDMatrix AvatarBase;
 	HIDMatrix Screen;
-	HIDMatrix GunBack;
-	HIDMatrix GunTip;
 };
 
 #define HID ((struct HardwareInput*)0xf0000000)
