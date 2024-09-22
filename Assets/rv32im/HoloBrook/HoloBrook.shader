@@ -45,6 +45,8 @@ Shader "Unlit/HoloBrook"
 				uint  advanced_descritptor : AD;
 				uint  this_descriptor : TD;
 				uint  vertexID : VID;
+				
+				float4x4 matrixxform : MAT;
 				UNITY_VERTEX_OUTPUT_STEREO
             };
 
@@ -60,6 +62,86 @@ Shader "Unlit/HoloBrook"
             sampler2D _MainTex;
             float4 _MainTex_ST;
 
+			float4x4 GenTransform( uint mode, uint ptr )
+			{
+				if( !ptr || (ptr & 15) ) mode = 0;
+
+				float4 transcale = float4( 0.0, 0.0, 0.0, 1.0 );
+				float4 q = float4( 1.0, 0.0, 0.0, 0.0 );
+
+				if( mode == 1 )
+				{
+					uint4 intTS = LoadMemInternalBlockNoCache( ptr );
+					uint4 intQ = LoadMemInternalBlockNoCache( ptr + 16 );
+					transcale = intTS * 1.0 / 4096.0;
+					q = intQ;
+				}
+				else if( mode == 2 )
+				{
+					uint4 intTS = LoadMemInternalBlockNoCache( ptr );
+					uint4 intQ = LoadMemInternalBlockNoCache( ptr + 16 );
+					transcale = intTS * 1.0 / 4096.0;
+					
+					
+					float X = intQ.x / 4096.0 * 3.1415926536 / 1.0f; // roll
+					float Y = intQ.y / 4096.0 * 3.1415926536 / 1.0f; // pitch
+					float Z = intQ.z / 4096.0 * 3.1415926536 / 1.0f; // yaw
+					float cx = cos(X);
+					float sx = sin(X);
+					float cy = cos(Y);
+					float sy = sin(Y);
+					float cz = cos(Z);
+					float sz = sin(Z);
+
+					// Correct according to
+					// http://en.wikipedia.org/wiki/Conversion_between_MQuaternions_and_Euler_angles
+					q[0] = cx * cy * cz + sx * sy * sz; // q1
+					q[1] = sx * cy * cz - cx * sy * sz; // q2
+					q[2] = cx * sy * cz + sx * cy * sz; // q3
+					q[3] = cx * cy * sz - sx * sy * cz; // q4
+				}
+
+				q = normalize( q );
+				
+				// Reduced calculation for speed
+				
+				float xx = 2 * q[1] * q[1];
+				float xy = 2 * q[1] * q[2];
+				float xz = 2 * q[1] * q[3];
+				float xw = 2 * q[1] * q[0];
+
+				float yy = 2 * q[2] * q[2];
+				float yz = 2 * q[2] * q[3];
+				float yw = 2 * q[2] * q[0];
+
+				float zz = 2 * q[3] * q[3];
+				float zw = 2 * q[3] * q[0];
+				
+				return float4x4(
+					1 - yy - zz,
+					xy - zw,
+					xz + yw,
+					transcale.x,				
+			
+					xy + zw,
+					1 - xx - zz,
+					yz - xw,
+					transcale.y,
+
+					xz - yw,
+					yz + xw,
+					1 - xx - yy,
+					transcale.z,
+
+					0,
+					0,
+					0,
+					1 );
+			
+				//return float4x4( 1, 0, 0, 0,  0, 1, 0, 0,  0, 0, 1, 0,  0, 0, 0, 1 );				
+			}
+			
+
             v2g vert (appdata v)
             {
                 v2g o;
@@ -67,13 +149,42 @@ Shader "Unlit/HoloBrook"
 				UNITY_INITIALIZE_OUTPUT( v2g, o );
 				
 				uint advanced_descritptor = o.advanced_descritptor = (_SelfTexture2D[uint2(12, _SelfTexture2D_TexelSize.w - 1)].y );
-				o.this_descriptor = advanced_descritptor ? (LoadMemInternalRB( advanced_descritptor + 68 + v.vertexID * 4) ): 0;
+				uint descriptor = o.this_descriptor = advanced_descritptor ? (LoadMemInternalRB( advanced_descritptor + 68 + v.vertexID * 4) ): 0;
+				
 				o.vertexID = v.vertexID; // Always zero?
 				UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO( o );
 
+				if( descriptor )
+				{
+					uint nModeAndNum = LoadMemInternalRB( descriptor );
+					uint nNumTris = nModeAndNum & 0xffff;
+					uint nMode = (nModeAndNum >> 16);
+					
+					uint nTransModes = LoadMemInternalRB( descriptor + 4 );
+					
+					uint nPList = LoadMemInternalRB( descriptor + 16 );
+					
+					uint4 pXform0Ptr = LoadMemInternalRB( descriptor + 32 );
+					uint4 pXform1Ptr = LoadMemInternalRB( descriptor + 36 );
+					uint4 pXform2Ptr = LoadMemInternalRB( descriptor + 40 );
+					uint4 pXform3Ptr = LoadMemInternalRB( descriptor + 44 );
+					
+					float4x4 pXform0 = GenTransform( (nTransModes >> 0 )  & 0xff, pXform0Ptr );
+					float4x4 pXform1 = GenTransform( (nTransModes >> 8 )  & 0xff, pXform1Ptr );
+					float4x4 pXform2 = GenTransform( (nTransModes >> 16 ) & 0xff, pXform2Ptr );
+					float4x4 pXform3 = GenTransform( (nTransModes >> 24 ) & 0xff, pXform3Ptr );
+					
+					o.matrixxform = mul( mul( mul( pXform3, pXform2 ), pXform1), pXform0 );
+				}
+				else
+				{
+					o.matrixxform = float4x4( 1, 0, 0, 0,  0, 1, 0, 0,  0, 0, 1, 0,  0, 0, 0, 1 );
+				}
+
                 return o;
             }
-			
+
+
 			[maxvertexcount(48)] // 16 Triangles.
 			[instance(32)]       // 32 instances = Up to 512 triangles.
 			void geo(point v2g pin[1], inout TriangleStream<g2f> triStream, 
@@ -102,20 +213,14 @@ Shader "Unlit/HoloBrook"
 						const uint32_t * pReserved3; // UNUSED
 					} __attribute__((packed));
 				*/
-				
+
 				uint nModeAndNum = LoadMemInternalRB( descriptor );
 				uint nNumTris = nModeAndNum & 0xffff;
-				uint nMode = nModeAndNum >> 16;
+				uint nMode = (nModeAndNum >> 16);
 				
-				uint nPList = LoadMemInternalRB( descriptor + 8 );
+				uint nTransModes = LoadMemInternalRB( descriptor + 4 );
 				
-				uint4 pXform1Ptr = LoadMemInternalRB( descriptor + 16 );
-				uint4 pXform2Ptr = LoadMemInternalRB( descriptor + 24 );
-				
-				float4 pXform1A = float4( 1.0, 1.0, 1.0, 1.0 / 4096 ) * ( pXform1Ptr ? LoadMemInternalBlockNoCache( pXform1Ptr ) : uint4( 0, 0, 0, 4096 ) );
-				float4 pXform1B = 1.0 / 4096 * ( pXform1Ptr ? LoadMemInternalBlockNoCache( pXform1Ptr + 16 ) : uint4( 4096, 0, 0, 0 ) );
-				float4 pXform2A = float4( 1.0, 1.0, 1.0, 1.0 / 4096 ) * ( pXform2Ptr ? LoadMemInternalBlockNoCache( pXform2Ptr ) : uint4( 0, 0, 0, 4096 ) );
-				float4 pXform2B = 1.0 / 4096 * ( pXform2Ptr ? LoadMemInternalBlockNoCache( pXform2Ptr + 16 ) : uint4( 4096, 0, 0, 0 ) );
+				uint nPList = LoadMemInternalRB( descriptor + 16 );
 				
 				//pXform1B = float4( 1, 0, 0, 0 );
 				g2f o;
@@ -139,9 +244,10 @@ Shader "Unlit/HoloBrook"
 					float4 pTC = pdTC;
 
 					// vector rotate quat.
-					pTA.xyz = ( pTA.xyz + 2.0 * cross(pXform1B.xyz, cross(pXform1B.xyz, pTA.xyz) + pXform1B.w * pTA.xyz) ) * pXform1A.w + pXform1A.xyz;
-					pTB.xyz = ( pTB.xyz + 2.0 * cross(pXform1B.xyz, cross(pXform1B.xyz, pTB.xyz) + pXform1B.w * pTB.xyz) ) * pXform1A.w + pXform1A.xyz;
-					pTC.xyz = ( pTC.xyz + 2.0 * cross(pXform1B.xyz, cross(pXform1B.xyz, pTC.xyz) + pXform1B.w * pTC.xyz) ) * pXform1A.w + pXform1A.xyz;
+					//( pTB.xyz + 2.0 * cross(pXform1B.xyz, cross(pXform1B.xyz, pTB.xyz) + pXform1B.w * pTB.xyz) ) * pXform1A.w + pXform1A.xyz;
+					pTA.xyz = mul( p.matrixxform, float4( pTA.xyz, 4096.0 ) );
+					pTB.xyz = mul( p.matrixxform, float4( pTB.xyz, 4096.0 ) );
+					pTC.xyz = mul( p.matrixxform, float4( pTC.xyz, 4096.0 ) );
 
 					o.norm = cross( pTC.xyz - pTA.xyz, pTB.xyz - pTA.xyz );
 					

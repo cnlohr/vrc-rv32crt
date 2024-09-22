@@ -24,10 +24,6 @@ struct Hardware hardwaredef ALIGN =
 
 #include "microlibc.c"
 
-
-struct holoSteamObject hso ALIGN;
-struct holoTransform pistolBase ALIGN;
-
 void main( void )
 {
 	termdata[0][0] = 'X';	
@@ -37,11 +33,6 @@ void main( void )
 
 	backscreendata[0][0] = 'B';
 
-	hardwaredef.holostreamObjects[0] = &hso;	
-	hso.nNumberOfTriangles = pistol_Tris;
-	hso.nMode = pistol_Mode;
-	hso.pTriangleList = pistol_Data;
-	hso.pXform1 = &pistolBase;
 
 	for( i = 0; ; i++ )
 	{
@@ -71,16 +62,53 @@ void main( void )
 }
 
 
+void eulertoquat( int x, int y, int z, int32_t * quat )
+{
+	// ? what do ?
+	
+}
+
+
+struct holoSteamObject hso ALIGN;
+struct holoTransform pistolBase0 ALIGN;
+struct holoTransform pistolBase1 ALIGN;
+
 void otherharts( int hartid )
 {
 	int k = hartid;
+	int i;
+	
+	if( hartid == 1 )
+	{
+		hardwaredef.holostreamObjects[0] = &hso;	
+		hso.nNumberOfTriangles = pistol_Tris;
+		hso.pTriangleList = pistol_Data;
+		hso.nMode = pistol_Mode;
+		
+		hso.nTransMode0 = 1;
+		hso.nTransMode1 = 2;
+		
+		hso.pXform0 = &pistolBase0;
+		hso.pXform1 = &pistolBase1;
+
+		pistolBase0.tq.S = 4096;
+		pistolBase1.tq.S = 4096;
+		
+		pistolBase0.tq.qW = 4096;
+		pistolBase0.tq.tX = 4096;
+	}
+	
 	while(1)
 	{
-		
-		pistolBase.S = 4096;
-		pistolBase.tX = 4096;
-		pistolBase.qW = 4096;
-		if( pistolBase.tX > 8192 ) pistolBase.tX = 0;
+		//pistolBase.tq.qW = 4096-i;
+		if( hartid == 1 )
+		{
+			pistolBase1.te.rX = i;
+			pistolBase1.te.rY = i;
+			pistolBase1.te.rZ = i;
+			i += 1;
+			if( i > 4096 ) i = 0;
+		}
 
 		k++;
 		backscreendata[hartid/8][(hartid%8)*4+0] = '0' + ((k/1000)%10);

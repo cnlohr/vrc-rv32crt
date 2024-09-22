@@ -13,23 +13,45 @@
 
 struct holoTransform
 {
-	int32_t tX, tY, tZ, S;
-	int32_t qW, qX, qY, qZ;
+	union
+	{
+		struct holoTransQuat
+		{
+			int32_t tX, tY, tZ, S;
+			int32_t qW, qX, qY, qZ;
+		} __attribute__((packed)) tq;
+
+		struct holoTransEuler
+		{
+			int32_t tX, tY, tZ, S;
+			int32_t rX, rY, rZ, res;
+		} __attribute__((packed)) te;
+	};
 } __attribute__((packed));
 
 struct holoSteamObject
 {
 	uint16_t nNumberOfTriangles;
-	uint16_t nMode;
-	uint16_t nReserved;
-	uint16_t nReserved2;
+	uint8_t nMode;
+	uint8_t nReserved;
+
+	uint8_t nTransMode0;
+	uint8_t nTransMode1;
+	uint8_t nTransMode2;
+	uint8_t nTransMode3;
+	
+	uint32_t nReserved1;
+	uint32_t nReserved2;
+
 	const uint32_t * pTriangleList;
 	const uint32_t * pReserved1; // UNUSED
-	
-	struct holoTransform * pXform1;
 	const uint32_t * pReserved2; // UNUSED
-	struct holoTransform * pXform2;
 	const uint32_t * pReserved3; // UNUSED
+	
+	struct holoTransform * pXform0;
+	struct holoTransform * pXform1;
+	struct holoTransform * pXform2;
+	struct holoTransform * pXform3;
 } __attribute__((packed));
 
 struct Hardware
